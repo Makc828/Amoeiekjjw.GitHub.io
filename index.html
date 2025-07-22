@@ -2,428 +2,1217 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم ليلى: مساعد المتجر الذكي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>TERAKS STORE</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Fonts: Cairo for headings, Noto Sans Arabic for body text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles for Inter font and general body styling */
+        /* General App Styling */
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; /* Light gray background */
+            font-family: 'Noto Sans Arabic', sans-serif; /* Default body font */
+            background-color: #f0f2f5; /* Light gray background for app feel */
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent body scroll, pages will scroll */
+            /* Prevent text selection and zoom for native app feel */
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            touch-action: manipulation; /* Disable double tap zoom */
+            -webkit-text-size-adjust: 100%; /* Prevent font boosting */
         }
-        /* Custom scrollbar for textareas */
-        textarea::-webkit-scrollbar {
-            width: 8px;
+
+        /* Apply Cairo to headings and prominent text */
+        h1, h2, h3, .product-card h3, .price, .total-line span, #checkout-btn, .add-to-cart-btn, 
+        .product-card .add-to-cart-btn-card, .product-card .view-details-btn, .nav-item span,
+        .app-modal-content h3, .app-modal-content button {
+            font-family: 'Cairo', sans-serif;
         }
-        textarea::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
+
+        /* IMPORTANT: Ensure Font Awesome icons use their correct font */
+        .fas {
+            font-family: "Font Awesome 6 Free" !important;
+            font-weight: 900 !important; /* For solid icons */
         }
-        textarea::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
+
+        #app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Full viewport height */
+            max-width: 500px; /* Max width for mobile-like feel */
+            margin: 0 auto; /* Center the app container */
+            background-color: white; /* App background */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            border-radius: 15px; /* Rounded corners for app container */
+            overflow: hidden; /* Hide overflow from pages */
         }
-        textarea::-webkit-scrollbar-thumb:hover {
-            background: #555;
+
+        /* Header Styling */
+        header {
+            background-color: #6b46c1; /* Purple */
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            z-index: 10; /* Above content */
+            display: flex; /* Use flex for header content */
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 {
+            font-size: 1.8rem; /* Larger title */
+            font-weight: bold;
+            flex-grow: 1; /* Allow title to take space */
+            text-align: center; /* Center the title */
+        }
+        .header-icons {
+            display: flex;
+            gap: 1rem;
+            font-size: 1.2rem;
+        }
+        .header-icon-btn {
+            background: none;
+            border: none;
+            color: white;
+            position: relative;
+            cursor: pointer;
+            padding: 0; /* Remove default button padding */
+            line-height: 1; /* Ensure icon is centered */
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ef4444; /* Red */
+            color: white;
+            border-radius: 50%;
+            padding: 0.1rem 0.4rem;
+            font-size: 0.7rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        /* Page Content Styling */
+        .page-content {
+            flex-grow: 1;
+            overflow-y: auto; /* Enable scrolling for page content */
+            background-color: #f0f2f5; /* Page background */
+            display: none; /* Hidden by default */
+            position: absolute; /* Position for transitions */
+            top: 0; 
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            transform: translateX(100%);
+            opacity: 0;
+            z-index: 5;
+            flex-direction: column;
+            /* No padding-bottom here, sticky elements will handle space */
+        }
+        .page-content.active {
+            display: flex; 
+            transform: translateX(0);
+            opacity: 1;
+            position: relative;
+            z-index: 6;
+        }
+        .page-content.slide-out {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+        .page-content.from-left {
+            transform: translateX(-100%);
+        }
+        .page-content.from-left.active {
+            transform: translateX(0);
+        }
+        /* Specific page adjustments */
+        #products-page {
+            padding-top: 1rem; /* Added padding for content */
+        }
+        #product-details-page {
+            padding-top: 0; /* Header is part of content flow */
+        }
+        #chat-page, #cart-page {
+            padding-top: 1rem; /* Add general top padding for content */
+        }
+
+
+        /* Bottom Navigation Bar */
+        #bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: white;
+            border-top: 1px solid #e0e0e0;
+            padding: 0.5rem 0;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+            z-index: 20;
+            position: relative;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #a0a0a0;
+            font-size: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: color 0.2s ease-in-out;
+            flex: 1;
+        }
+        .nav-item.active {
+            color: #6b46c1;
+        }
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 0.2rem;
+        }
+        #chat-nav-item {
+            background-color: #6b46c1;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20%);
+            transition: background-color 0.2s ease-in-out;
+        }
+        #chat-nav-item:hover {
+            background-color: #5a32a3;
+        }
+
+        /* Product Card Styling */
+        .product-card {
+            background-color: white;
+            border-radius: 10px; /* 10px radius */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s ease-in-out;
+            width: calc(50% - 0.5rem); /* Fixed width - تم تعديل العرض ليكون نصف الشاشة مع مسافة بين البطاقات */
+            /* Removed fixed height: height: 240px; */
+            margin-bottom: 1rem;
+            flex-shrink: 0; /* Prevent shrinking in grid */
+        }
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .product-card img {
+            width: 100%; /* 160px */
+            height: 140px; /* Adjusted height to allow more space for content */
+            object-fit: cover;
+            border-bottom: 1px solid #eee;
+            border-top-left-radius: 10px; /* Top corners rounded */
+            border-top-right-radius: 10px;
+        }
+        .product-card-info {
+            padding: 0.75rem; /* Increased padding */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between; /* Push buttons to bottom */
+        }
+        .product-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem; /* Reduced margin */
+            overflow: hidden; /* Hide overflow */
+            text-overflow: ellipsis; /* Add ellipsis */
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Limit to 2 lines */
+            -webkit-box-orient: vertical;
+            height: 2.8rem; /* Fixed height for two lines */
+        }
+        .product-card .price {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #6b46c1;
+            margin-bottom: 0.5rem;
+        }
+        .product-card .availability {
+            padding: 0.3rem 0.6rem; /* Slightly larger padding */
+            border-radius: 9999px;
+            font-size: 0.75rem; /* Slightly larger font */
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+        .product-card .buttons-container {
+            display: flex;
+            gap: 0.25rem; /* Smaller gap */
+            margin-top: auto; /* Push to bottom */
+            width: 100%;
+            justify-content: center; /* Center buttons */
+        }
+        .product-card .buttons-container button {
+            padding: 0.5rem 0.6rem; /* Slightly larger padding */
+            border-radius: 6px; /* Slightly smaller radius */
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out;
+            font-size: 0.8rem; /* Slightly larger font size */
+            flex: 1; /* Allow buttons to grow */
+            max-width: 50%; /* Max width for two buttons */
+        }
+        .product-card .view-details-btn {
+            background-color: transparent; /* No background */
+            color: #3b82f6; /* Blue text */
+            border: 1px solid #3b82f6; /* Blue border */
+        }
+        .product-card .view-details-btn:hover {
+            background-color: #e0f2fe; /* Light blue hover */
+        }
+        .product-card .add-to-cart-btn-card {
+            background-color: #6b46c1; /* Purple */
+            color: white;
+            border: 1px solid #6b46c1; /* Purple border */
+            width: 30px; /* Fixed width for icon button */
+            height: 30px; /* Fixed height for icon button */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem; /* Icon size */
+            border-radius: 50%; /* Circular */
+            flex: none; /* Don't grow */
+        }
+        .product-card .add-to-cart-btn-card:hover {
+            background-color: #5a32a3;
+        }
+        /* Adjust display for fixed card size - تم تغيير النظام من Grid إلى Flexbox */
+        #products-display {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 1rem; /* Increased gap for better spacing */
+            padding: 0 0.5rem 1rem;
+            width: 100%;
+        }
+        /* Ensure no horizontal scroll for products-display */
+        #products-page {
+            overflow-x: hidden;
+        }
+
+        /* Product Details Page Styling */
+        #product-details-page .details-header {
+            background-color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            width: 100%;
+            z-index: 10;
+        }
+        #product-details-page .details-header button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6b46c1;
+            padding: 0 10px;
+        }
+        #product-details-page .details-header h2 {
+            flex-grow: 1;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-right: 40px; /* Offset for back button */
+        }
+        #product-details-page .details-content-wrapper {
+            flex-grow: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            background-color: #f0f2f5;
+            padding: 1rem;
+        }
+        /* Adjusted image size for product details */
+        #product-details-page img {
+            width: 200px; /* Increased width */
+            height: 300px; /* Increased height */
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        #product-details-page h3 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        #product-details-page .type {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        #product-details-page .description {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+            max-width: 80%;
+        }
+        #product-details-page .price {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #6b46c1;
+            margin-bottom: 1rem;
+        }
+        #product-details-page .availability {
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        #product-details-page .add-to-cart-btn {
+            background-color: #6b46c1;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+        #product-details-page .add-to-cart-btn:hover {
+            background-color: #5a32a3;
+        }
+
+        /* Chat Page Styling */
+        #chat-page {
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Ensure chat page takes full height */
+        }
+        #chat-page .chat-messages-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #f3f4f6;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            /* Removed padding-bottom */
+        }
+        #chat-page .message {
+            margin-bottom: 0.75rem;
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            max-width: 80%;
+            line-height: 1.4;
+        }
+        #chat-page .user-message {
+            background-color: #dbeafe;
+            align-self: flex-end;
+            margin-right: auto;
+            text-align: right;
+        }
+        #chat-page .layla-message {
+            background-color: #e9d5ff;
+            align-self: flex-start;
+            margin-left: auto;
+            text-align: left;
+        }
+        #chat-page .chat-input-area {
+            background-color: white;
+            padding: 0.75rem 1rem;
+            border-top: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: sticky; /* Make it stick to the bottom */
+            bottom: 0; /* Stick to the bottom of its flex container */
+            z-index: 7;
+            flex-shrink: 0; /* Prevent it from shrinking */
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); /* Add shadow for separation */
+        }
+        #chat-page .chat-input-area input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+        }
+        #chat-page .chat-input-area button {
+            background-color: #6b46c1;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s ease-in-out;
+        }
+        #chat-page .chat-input-area button:hover {
+            background-color: #5a32a3;
+        }
+
+        /* Cart Page Styling */
+        #cart-page {
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Ensure cart page takes full height */
+        }
+        #cart-page .cart-items-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #f0f2f5;
+            padding: 1rem;
+            /* Removed padding-bottom */
+        }
+        .cart-item {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .cart-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-left: 1rem;
+            flex-shrink: 0;
+        }
+        .cart-item-info {
+            flex-grow: 1;
+        }
+        .cart-item-info h4 {
+            font-weight: 600;
+            color: #333;
+            font-size: 1rem;
+        }
+        .cart-item-info p {
+            color: #666;
+            font-size: 0.85rem;
+        }
+        .cart-item .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-right: 1rem;
+        }
+        .cart-item .quantity-controls button {
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .cart-item .quantity-controls span {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .cart-item .remove-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            font-size: 1.2rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        #cart-total-container {
+            background-color: white;
+            padding: 1rem;
+            border-top: 1px solid #eee;
+            text-align: center;
+            position: sticky; /* Make it stick to the bottom */
+            bottom: 0; /* Stick to the bottom of its flex container */
+            z-index: 7;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-shrink: 0; /* Prevent it from shrinking */
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        #cart-total-container .total-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1rem; /* Adjusted font size for "الإجمالية" */
+            font-weight: bold;
+            color: #333;
+        }
+        #cart-total-container .total-line span:first-child {
+            font-size: 0.9rem; /* Smaller font for labels like "المنتجات", "التوصيل" */
+        }
+        #cart-total-container .total-line span:last-child {
+            font-size: 1.1rem; /* Slightly larger for values */
+        }
+        #cart-total-container .total-line.text-lg { /* For "الإجمالي" line */
+            font-size: 1.2rem; /* Adjusted font size for "الإجمالي" */
+        }
+        #cart-total-container .delivery-note {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 0.5rem;
+            line-height: 1.3;
+        }
+        #checkout-btn {
+            background-color: #6b46c1;
+            color: white;
+            padding: 0.6rem 1.2rem; /* Adjusted padding for "الشراء" button */
+            border-radius: 10px; /* Slightly smaller border radius */
+            font-weight: bold;
+            font-size: 1rem; /* Adjusted font size for "الشراء" button */
+            transition: background-color 0.2s ease-in-out;
+            width: 100%;
+            margin-top: 0.8rem; /* Adjusted margin */
+        }
+        #checkout-btn:hover {
+            background-color: #5a32a3;
+        }
+
+
+        /* Store Notes Display */
+        #store-notes-display {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin: 0.5rem 1rem 1rem 1rem; /* Adjusted top margin to be smaller */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            font-size: 0.9rem;
+            color: #333;
+            text-align: center;
+            line-height: 1.4; /* Ensure full visibility for multi-line */
+            white-space: normal; /* Allow wrapping */
+            overflow: hidden; /* Hide overflow if it somehow still happens */
+            text-overflow: ellipsis; /* Add ellipsis if it truncates */
+        }
+
+        /* Modals (Checkout, Notifications, Privacy Policy) */
+        .app-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000; /* High z-index */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .app-modal.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .app-modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .app-modal-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #4a5568;
+        }
+        .app-modal-close-btn:hover {
+            color: #2d3748;
+        }
+        .app-modal-content input, .app-modal-content textarea, .app-modal-content select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .app-modal-content button {
+            background-color: #6b46c1;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .app-modal-content button:hover {
+            background-color: #5a32a3;
+        }
+        .app-modal-content .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .app-modal-content .checkbox-container input {
+            width: auto;
+        }
+
+        /* Notification Modal */
+        #notification-modal .notification-item {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        #notification-modal .notification-item h4 {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+            color: #333;
+        }
+        #notification-modal .notification-item p {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+        #notification-modal .notification-item .timestamp {
+            font-size: 0.75rem;
+            color: #888;
+            text-align: left; /* Align timestamp to left */
+        }
+        #notification-modal .no-notifications {
+            text-align: center;
+            color: #888;
+        }
+
+        /* Toast Notification */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px; /* Slide from right for RTL */
+            background-color: #6b46c1;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 10001;
+            opacity: 0;
+            transform: translateX(100%); /* Start off-screen right */
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 250px;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .toast-notification .toast-title {
+            font-weight: bold;
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-7xl mx-auto bg-white shadow-lg rounded-xl p-6 md:p-10">
-        <!-- Header Section -->
-        <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-2">لوحة تحكم ليلى - متجر الكتب</h1>
-            <p class="text-lg text-gray-600 mb-4">أداة شاملة ومستقلة لتدريب وإدارة مساعدك الذكي "ليلى".</p>
-            <div class="bg-blue-100 text-blue-800 p-3 rounded-lg text-sm mb-4">
-                <span class="font-semibold">معرف المستخدم الذي تتصل به (للتخزين):</span>
-                <span id="userIdDisplay" class="break-all font-mono text-blue-900">جاري التحميل...</span>
+<body>
+    <!-- Main App Container -->
+    <div id="app-container">
+        <!-- Header (Common for all main pages) -->
+        <header>
+            <div class="header-icons">
+                <button id="notification-icon" class="header-icon-btn">
+                    <i class="fas fa-bell"></i>
+                    <span id="notification-badge" class="notification-badge hidden">0</span>
+                </button>
+                <button id="email-icon" class="header-icon-btn">
+                    <i class="fas fa-envelope"></i>
+                </button>
+                <button id="privacy-policy-icon" class="header-icon-btn">
+                    <i class="fas fa-shield-alt"></i>
+                </button>
             </div>
-            <!-- Message Display Area -->
-            <div id="messageDisplay" class="p-3 rounded-lg text-center text-sm font-medium hidden"></div>
+            <!-- TERAKS title in the header -->
+            <h1 id="header-title" class="text-xl md:text-2xl font-bold text-white flex-grow text-center">متجر TERAKS</h1>
         </header>
 
-        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Left Column: Intent, Product, Notes, and Notifications Forms -->
-            <div class="space-y-8">
-                <!-- Train Layla: Add New Intent Section -->
-                <section class="bg-gray-50 p-6 rounded-xl shadow-md">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">تدريب ليلى: إضافة نية جديدة</h2>
-                    <div class="mb-4">
-                        <label for="intentName" class="block text-sm font-medium text-gray-700 mb-1">اسم النية:</label>
-                        <input type="text" id="intentName" placeholder="مثال: ساعات العمل" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div class="mb-4">
-                        <label for="trainingPhrases" class="block text-sm font-medium text-gray-700 mb-1">العبارات التدريبية (افصل بفاصلة أو سطر جديد):</label>
-                        <textarea id="trainingPhrases" rows="4" placeholder="مثال: متى تفتحون؟, ما هي ساعات عملكم؟" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
-                    </div>
-                    <div class="mb-6">
-                        <label for="intentOutput" class="block text-sm font-medium text-gray-700 mb-1">المخرج (الإجابة):</label>
-                        <textarea id="intentOutput" rows="4" placeholder="مثال: نحن نفتح من الساعة 9 صباحاً حتى 6 مساءً، من الأحد إلى الخميس." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <button id="addIntentBtn" class="flex-1 bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 shadow-md">إضافة النية لليلى</button>
-                        <button id="updateIntentBtn" class="flex-1 bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200 shadow-md hidden">تحديث النية</button>
-                        <button id="cancelEditIntentBtn" class="flex-1 bg-gray-400 text-white p-3 rounded-lg font-semibold hover:bg-gray-500 transition duration-200 shadow-md hidden">إلغاء التعديل</button>
-                    </div>
-                </section>
-
-                <!-- Train Layla: Add New Product Section -->
-                <section class="bg-gray-50 p-6 rounded-xl shadow-md">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">تدريب ليلى: إضافة منتج جديد</h2>
-                    <div class="mb-4">
-                        <label for="productName" class="block text-sm font-medium text-gray-700 mb-1">اسم المنتج:</label>
-                        <input type="text" id="productName" placeholder="مثال: رواية العجوز والبحر" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div class="mb-4">
-                        <label for="productType" class="block text-sm font-medium text-gray-700 mb-1">نوع المنتج:</label>
-                        <input type="text" id="productType" placeholder="مثال: رواية، أدبي، خيال علمي، إلكترونيات" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div class="mb-4">
-                        <label for="productDescription" class="block text-sm font-medium text-gray-700 mb-1">وصف المنتج:</label>
-                        <textarea id="productDescription" rows="3" placeholder="مثال: قصة كلاسيكية عن الصياد العجوز وكفاحه مع سمكة المارلين العملاقة." class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
-                    </div>
-                    <div class="mb-4">
-                        <label for="productImageUrl" class="block text-sm font-medium text-gray-700 mb-1">رابط صورة المنتج (اختياري):</label>
-                        <input type="url" id="productImageUrl" placeholder="مثال: https://example.com/image.jpg" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                        <div>
-                            <label for="productPrice" class="block text-sm font-medium text-gray-700 mb-1">السعر:</label>
-                            <input type="text" id="productPrice" placeholder="مثال: 25 دولار" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label for="productAvailability" class="block text-sm font-medium text-gray-700 mb-1">التوفر:</label>
-                            <select id="productAvailability" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                                <option value="متوفر">متوفر</option>
-                                <option value="غير متوفر">غير متوفر</option>
-                                <option value="قريباً">قريباً</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="mb-6 flex items-center">
-                        <input type="checkbox" id="productIsOffer" class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
-                        <label for="productIsOffer" class="ml-2 block text-sm font-medium text-gray-700">هل هو عرض خاص؟</label>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <button id="addProductBtn" class="flex-1 bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 shadow-md">إضافة المنتج لليلى</button>
-                        <button id="updateProductBtn" class="flex-1 bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200 shadow-md hidden">تحديث المنتج</button>
-                        <button id="cancelEditProductBtn" class="flex-1 bg-gray-400 text-white p-3 rounded-lg font-semibold hover:bg-gray-500 transition duration-200 shadow-md hidden">إلغاء التعديل</button>
-                    </div>
-                </section>
-
-                <!-- Store Notes Section -->
-                <section class="bg-gray-50 p-6 rounded-xl shadow-md">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">ملاحظات المتجر</h2>
-                    <div class="mb-4">
-                        <label for="noteTitle" class="block text-sm font-medium text-gray-700 mb-1">عنوان الملاحظة (اختياري):</label>
-                        <input type="text" id="noteTitle" placeholder="مثال: إعلان هام" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div class="mb-4">
-                        <label for="noteContent" class="block text-sm font-medium text-gray-700 mb-1">محتوى الملاحظة:</label>
-                        <textarea id="noteContent" rows="4" placeholder="مثال: خصومات 20% على جميع الروايات هذا الأسبوع!" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <button id="addNoteBtn" class="flex-1 bg-indigo-600 text-white p-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-200 shadow-md">إضافة ملاحظة</button>
-                        <button id="updateNoteBtn" class="flex-1 bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200 shadow-md hidden">تحديث ملاحظة</button>
-                        <button id="cancelEditNoteBtn" class="flex-1 bg-gray-400 text-white p-3 rounded-lg font-semibold hover:bg-gray-500 transition duration-200 shadow-md hidden">إلغاء التعديل</button>
-                    </div>
-                    <div id="notesList" class="space-y-4 mt-6 max-h-60 overflow-y-auto pr-2">
-                        <!-- Notes will be loaded here by JavaScript -->
-                        <p class="text-gray-500 text-center">لا توجد ملاحظات حالياً.</p>
-                    </div>
-                </section>
-
-                <!-- Notifications Management Section -->
-                <section class="bg-gray-50 p-6 rounded-xl shadow-md">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">إدارة الإشعارات</h2>
-                    <div class="mb-4">
-                        <label for="notificationTitle" class="block text-sm font-medium text-gray-700 mb-1">عنوان الإشعار:</label>
-                        <input type="text" id="notificationTitle" placeholder="مثال: إشعار جديد" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div class="mb-4">
-                        <label for="notificationContent" class="block text-sm font-medium text-gray-700 mb-1">محتوى الإشعار:</label>
-                        <textarea id="notificationContent" rows="4" placeholder="مثال: وصول دفعة جديدة من الروايات!" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <button id="addNotificationBtn" class="flex-1 bg-purple-600 text-white p-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-200 shadow-md">إرسال إشعار</button>
-                        <button id="updateNotificationBtn" class="flex-1 bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200 shadow-md hidden">تحديث إشعار</button>
-                        <button id="cancelEditNotificationBtn" class="flex-1 bg-gray-400 text-white p-3 rounded-lg font-semibold hover:bg-gray-500 transition duration-200 shadow-md hidden">إلغاء التعديل</button>
-                    </div>
-                    <div id="notificationsList" class="space-y-4 mt-6 max-h-60 overflow-y-auto pr-2">
-                        <!-- Notifications will be loaded here by JavaScript -->
-                        <p class="text-gray-500 text-center">لا توجد إشعارات حالياً.</p>
-                    </div>
-                </section>
-
-                <!-- Test Layla Section -->
-                <section class="bg-gray-50 p-6 rounded-xl shadow-md">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">اختبر ليلى</h2>
-                    <div class="mb-4">
-                        <label for="testQuery" class="block text-sm font-medium text-gray-700 mb-1">اسأل ليلى:</label>
-                        <input type="text" id="testQuery" placeholder="مثال: هل لديكم رواية العجوز والبحر؟" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <button id="askLaylaBtn" class="w-full bg-purple-600 text-white p-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-200 shadow-md mb-4">اسأل ليلى</button>
-                    <div>
-                        <label for="laylaResponse" class="block text-sm font-medium text-gray-700 mb-1">استجابة ليلى:</label>
-                        <textarea id="laylaResponse" rows="5" readonly class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-800"></textarea>
-                    </div>
-                </section>
+        <!-- Products Page -->
+        <section id="products-page" class="page-content active">
+            <!-- Store Notes Display Area -->
+            <div id="store-notes-display" class="hidden">
+                <!-- Notes will be loaded here -->
             </div>
 
-            <!-- Right Column: Display Sections -->
-            <div class="space-y-8">
-                <!-- Existing Layla Intents Section -->
-                <section class="bg-gray-50 p-6 rounded-xl shadow-md">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">نوايا ليلى الموجودة (<span id="intentCount">0</span>)</h2>
-                    <div id="intentsList" class="space-y-4 max-h-96 overflow-y-auto pr-2">
-                        <!-- Intents will be loaded here by JavaScript -->
-                        <p class="text-gray-500 text-center">لا توجد نوايا بعد. أضف نية جديدة لتبدأ!</p>
-                    </div>
-                </section>
-
-                <!-- Existing Layla Products Section -->
-                <section class="bg-gray-50 p-6 rounded-xl shadow-md">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">منتجات ليلى الموجودة (<span id="productCount">0</span>)</h2>
-                    <div class="mb-4">
-                        <label for="productTypeFilter" class="block text-sm font-medium text-gray-700 mb-1">تصفية حسب النوع:</label>
-                        <select id="productTypeFilter" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">جميع الأنواع</option>
-                            <!-- Product types will be loaded here by JavaScript -->
-                        </select>
-                    </div>
-                    <div id="productsList" class="space-y-4 max-h-96 overflow-y-auto pr-2">
-                        <!-- Products will be loaded here by JavaScript -->
-                        <p class="text-gray-500 text-center">لا توجد منتجات مطابقة لهذا النوع.</p>
-                    </div>
-                </section>
-
-                <!-- Chat Logs Section - NEW -->
-                <section class="bg-gray-50 p-6 rounded-xl shadow-md">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-4">سجلات دردشة ليلى (<span id="chatLogCount">0</span>)</h2>
-                    <div class="mt-4 mb-4 text-center flex justify-center gap-2">
-                        <button id="showUnansweredOnlyBtn" class="bg-purple-500 text-white p-2 rounded-lg font-semibold hover:bg-purple-600 transition duration-200 text-sm">عرض الأسئلة غير المجابة فقط</button>
-                        <button id="showAllChatsBtn" class="bg-blue-500 text-white p-2 rounded-lg font-semibold hover:bg-blue-600 transition duration-200 text-sm hidden">عرض كل الدردشات</button>
-                    </div>
-                    <div id="chatLogsList" class="space-y-4 max-h-96 overflow-y-auto pr-2">
-                        <!-- سجلات الدردشة ستُحمّل هنا بواسطة JavaScript -->
-                        <p class="text-gray-500 text-center">لا توجد سجلات دردشة لعرضها بعد.</p>
-                    </div>
-                </section>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 px-4">
+                <!-- Search Input -->
+                <input type="text" id="productSearchInput" placeholder="ابحث عن منتج..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
             </div>
-        </main>
+            
+            <div class="flex flex-wrap justify-center items-center gap-4 mb-6 px-4">
+                <!-- Product Type Filter -->
+                <div class="flex items-center gap-2">
+                    <label for="productTypeFilterStore" class="text-base font-medium text-gray-700">النوع:</label>
+                    <select id="productTypeFilterStore" class="p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+                        <option value="">جميع الأنواع</option>
+                        <!-- Product types will be loaded here by JavaScript -->
+                    </select>
+                </div>
+                <!-- Offers Button -->
+                <button id="showOffersBtn" class="bg-purple-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-600 transition duration-200 text-sm flex items-center gap-2">
+                    <i class="fas fa-percent"></i>
+                    العروض
+                </button>
+            </div>
+
+            <div id="products-display" class="px-4 flex-grow">
+                <!-- Products will be loaded here by JavaScript -->
+                <p class="text-center text-gray-500 col-span-full">جاري تحميل المنتجات...</p>
+            </div>
+        </section>
+
+        <!-- Product Details Page -->
+        <section id="product-details-page" class="page-content">
+            <div class="details-header">
+                <button id="backToProductsBtn"><i class="fas fa-chevron-right"></i></button>
+                <h2 id="details-page-title">تفاصيل المنتج</h2>
+            </div>
+            <div class="details-content-wrapper">
+                <img id="details-image" src="" alt="صورة المنتج">
+                <h3 id="details-name"></h3>
+                <p id="details-type" class="type"></p>
+                <p id="details-description" class="description"></p>
+                <p id="details-price" class="price"></p>
+                <span id="details-availability" class="availability"></span>
+                <button id="addToCartBtn" class="add-to-cart-btn">أضف إلى السلة</button>
+            </div>
+        </section>
+
+        <!-- Chat Page -->
+        <section id="chat-page" class="page-content">
+            <div id="chat-messages-container" class="chat-messages-container">
+                <!-- Chat messages will appear here -->
+                <div class="layla-message message">مرحباً! كيف يمكنني مساعدتك اليوم؟</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="اكتب سؤالك هنا...">
+                <button id="send-chat-btn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </section>
+
+        <!-- Cart Page -->
+        <section id="cart-page" class="page-content">
+            <div id="cart-items-container" class="cart-items-container">
+                <!-- Cart items will be loaded here -->
+                <p class="text-center text-gray-500">سلتك فارغة حالياً.</p>
+            </div>
+            <div id="cart-total-container">
+                <div class="total-line">
+                    <span>المنتجات:</span>
+                    <span id="products-subtotal">0.00 IQD</span>
+                </div>
+                <div class="total-line">
+                    <span>التوصيل:</span>
+                    <span id="delivery-cost">0.00 IQD</span>
+                </div>
+                <div class="total-line text-lg font-extrabold text-purple-700">
+                    <span>الإجمالي:</span>
+                    <span id="final-total">0.00 IQD</span>
+                </div>
+                <p class="delivery-note">
+                    ملاحظات التوصيل: عند طلب كتب: البصرة (3,000 IQD)، باقي محافظات العراق (5,000 IQD).
+                    عند طلب منتجات أخرى: الناصرية (3,000 IQD)، باقي محافظات العراق (5,000 IQD).
+                </p>
+                <button id="checkout-btn">إتمام عملية الشراء</button>
+            </div>
+        </section>
+
+        <!-- Bottom Navigation Bar -->
+        <nav id="bottom-nav">
+            <div class="nav-item active" data-page="products-page">
+                <i class="fas fa-box"></i>
+                <span>المنتجات</span>
+            </div>
+            <div class="nav-item" data-page="chat-page">
+                <div id="chat-nav-item">
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+            </div>
+            <div class="nav-item" data-page="cart-page">
+                <i class="fas fa-shopping-cart"></i>
+                <span>السلة</span>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="app-modal">
+        <div class="app-modal-content">
+            <button class="app-modal-close-btn" id="close-checkout-modal">&times;</button>
+            <h3 class="text-xl font-bold text-center mb-4">إتمام عملية الشراء</h3>
+            <form id="checkout-form" action="https://formspree.io/f/xvgqkzbo" method="POST"> <!-- REPLACE WITH YOUR FORMSPREE FORM ID -->
+                <label for="governorate" class="block text-sm font-medium text-gray-700 mb-1">المحافظة:</label>
+                <select id="governorate" name="المحافظة" class="mb-3">
+                    <option value="">اختر محافظتك</option>
+                    <!-- Governorates will be populated by JS -->
+                </select>
+
+                <label for="area" class="block text-sm font-medium text-gray-700 mb-1">المنطقة:</label>
+                <input type="text" id="area" name="المنطقة" placeholder="ادخل المنطقة" class="mb-3">
+
+                <label for="landmark" class="block text-sm font-medium text-gray-700 mb-1">أقرب نقطة دالة:</label>
+                <input type="text" id="landmark" name="أقرب نقطة دالة" placeholder="مثال: قرب جامع النور" class="mb-3">
+
+                <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف:</label>
+                <input type="tel" id="phoneNumber" name="رقم الهاتف" placeholder="مثال: 07701234567" class="mb-3">
+
+                <label for="totalPriceForm" class="block text-sm font-medium text-gray-700 mb-1">السعر الكلي للطلب:</label>
+                <input type="text" id="totalPriceForm" name="السعر الكلي للطلب" readonly class="mb-3 bg-gray-100">
+
+                <label for="additionalNotes" class="block text-sm font-medium text-gray-700 mb-1">ملاحظات إضافية (اختياري):</label>
+                <textarea id="additionalNotes" name="ملاحظات إضافية" rows="3" placeholder="أي تفاصيل إضافية للطلب" class="mb-3"></textarea>
+
+                <div class="checkbox-container">
+                    <input type="checkbox" id="saveAddressCheckbox" class="h-4 w-4">
+                    <label for="saveAddressCheckbox" class="text-sm">حفظ العنوان للمرة القادمة</label>
+                </div>
+                <p id="saveAddressTip" class="text-xs text-gray-500 mt-1 hidden">عند تفعيل هذه الميزة، لن تحتاج لإدخال المعلومات في المرة القادمة، فقط اضغط على زر الشراء.</p>
+                <button type="submit" class="mt-4">تأكيد الشراء</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div id="notification-modal" class="app-modal">
+        <div class="app-modal-content">
+            <button class="app-modal-close-btn" id="close-notification-modal">&times;</button>
+            <h3 class="text-xl font-bold text-center mb-4">الإشعارات</h3>
+            <div id="notifications-list" class="flex flex-col gap-3">
+                <p class="no-notifications">لا توجد إشعارات حالياً.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacy-policy-modal" class="app-modal">
+        <div class="app-modal-content">
+            <button class="app-modal-close-btn" id="close-privacy-policy-modal">&times;</button>
+            <h3 class="text-xl font-bold text-center mb-4">سياسة الخصوصية</h3>
+            <p class="text-gray-700 text-sm leading-relaxed">
+                نحن في متجر TERAKS نلتزم بحماية خصوصيتك. يتم استخدام معلوماتك الشخصية فقط لإتمام طلباتك وتحسين تجربتك في المتجر. نحن لا نشارك بياناتك مع أطراف ثالثة.
+            </p>
+        </div>
+    </div>
+
+    <!-- Toast Notification (for new notifications) -->
+    <div id="toast-notification" class="toast-notification">
+        <i class="fas fa-bell"></i>
+        <div>
+            <div class="toast-title"></div>
+            <div class="toast-content text-xs"></div>
+        </div>
     </div>
 
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, onSnapshot, updateDoc, deleteDoc, query, where, getDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, getDocs, doc, updateDoc, enableIndexedDbPersistence, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase Configuration (from your 'store-ced42' project)
         const firebaseConfig = {
             apiKey: "AIzaSyByoPYBjMigsno_66nwa6L4q33shpmJDi8",
             authDomain: "store-ced42.firebaseapp.com",
-            projectId: "store-ced42", 
+            projectId: "store-ced42",
             storageBucket: "store-ced42.firebasestorage.app",
             messagingSenderId: "519838982253",
             appId: "1:519838982253:web:6c466eb08a708f5e4b9f64",
             measurementId: "G-MY39NRV7PE"
         };
 
-        // IMPORTANT: This is your provided User ID for the dashboard to access its own data.
-        // Data from the store will also be stored under this userId.
+        // The User ID under which data is stored (from your dashboard)
+        // This is the ADMIN_USER_ID from your dashboard, used to fetch intents/products
         const ADMIN_USER_ID = "bzC2JV95dGMiuUq6PW2oXmsskRm1"; 
 
-        // The app ID used for the Firestore path. Hardcoded to match where data is stored by the store.
-        const APP_ID_FOR_FIRESTORE_PATH = "store-ced42"; 
+        // The app ID used for the Firestore path (should match projectId)
+        // Using __app_id from Canvas environment if available, otherwise fallback to projectId
+        const APP_ID_FOR_FIRESTORE_PATH = typeof __app_id !== 'undefined' ? __app_id : firebaseConfig.projectId;
 
         let app;
         let db;
         let auth;
-        let userId; // This will be the ADMIN_USER_ID for the dashboard
+        let clientUserId; // This will be the actual client's UID (anonymous or authenticated)
 
-        // State variables for editing and data storage
-        let editingIntentId = null;
-        let editingProductId = null;
-        let editingNoteId = null; 
-        let editingNotificationId = null; 
+        let allIntents = [];
         let allProducts = []; 
-        let allChatLogs = []; // To store all fetched chat logs for filtering
+        let allNotes = []; 
+        let allNotifications = []; 
+        let unreadNotificationsCount = 0;
+        let lastNotificationTimestamp = 0; // To track new notifications
 
-        // Get references to UI elements
-        const userIdDisplay = document.getElementById('userIdDisplay');
-        const messageDisplay = document.getElementById('messageDisplay');
+        let currentFilter = 'all'; // 'all', 'offers', or a product type
+        let cartItems = []; 
 
-        // Intent form elements
-        const intentNameInput = document.getElementById('intentName');
-        const trainingPhrasesInput = document.getElementById('trainingPhrases');
-        const intentOutputInput = document.getElementById('intentOutput');
-        const addIntentBtn = document.getElementById('addIntentBtn');
-        const updateIntentBtn = document.getElementById('updateIntentBtn');
-        const cancelEditIntentBtn = document.getElementById('cancelEditIntentBtn');
-        const intentsList = document.getElementById('intentsList');
-        const intentCountSpan = document.getElementById('intentCount');
+        // UI Elements
+        const appContainer = document.getElementById('app-container');
+        const headerTitle = document.getElementById('header-title'); 
+        const productsPage = document.getElementById('products-page');
+        const productDetailsPage = document.getElementById('product-details-page');
+        const chatPage = document.getElementById('chat-page');
+        const cartPage = document.getElementById('cart-page');
+        const pages = document.querySelectorAll('.page-content');
+        const bottomNav = document.getElementById('bottom-nav');
+        const navItems = document.querySelectorAll('.nav-item');
 
-        // Product form elements
-        const productNameInput = document.getElementById('productName');
-        const productTypeInput = document.getElementById('productType');
-        const productDescriptionInput = document.getElementById('productDescription');
-        const productImageUrlInput = document.getElementById('productImageUrl'); 
-        const productPriceInput = document.getElementById('productPrice');
-        const productAvailabilitySelect = document.getElementById('productAvailability');
-        const productIsOfferCheckbox = document.getElementById('productIsOffer'); 
-        const addProductBtn = document.getElementById('addProductBtn');
-        const updateProductBtn = document.getElementById('updateProductBtn');
-        const cancelEditProductBtn = document.getElementById('cancelEditProductBtn');
-        const productsList = document.getElementById('productsList');
-        const productCountSpan = document.getElementById('productCount');
-        const productTypeFilter = document.getElementById('productTypeFilter');
+        const productsDisplay = document.getElementById('products-display');
+        const productSearchInput = document.getElementById('productSearchInput'); 
+        const productTypeFilterStore = document.getElementById('productTypeFilterStore');
+        const showOffersBtn = document.getElementById('showOffersBtn');
+        const storeNotesDisplay = document.getElementById('store-notes-display'); 
 
-        // Store Notes elements
-        const noteTitleInput = document.getElementById('noteTitle');
-        const noteContentInput = document.getElementById('noteContent');
-        const addNoteBtn = document.getElementById('addNoteBtn');
-        const updateNoteBtn = document.getElementById('updateNoteBtn');
-        const cancelEditNoteBtn = document.getElementById('cancelEditNoteBtn');
-        const notesList = document.getElementById('notesList');
+        // Header Icons
+        const notificationIcon = document.getElementById('notification-icon');
+        const notificationBadge = document.getElementById('notification-badge');
+        const emailIcon = document.getElementById('email-icon');
+        const privacyPolicyIcon = document.getElementById('privacy-policy-icon');
 
-        // Notifications Management elements
-        const notificationTitleInput = document.getElementById('notificationTitle');
-        const notificationContentInput = document.getElementById('notificationContent');
-        const addNotificationBtn = document.getElementById('addNotificationBtn');
-        const updateNotificationBtn = document.getElementById('updateNotificationBtn');
-        const cancelEditNotificationBtn = document.getElementById('cancelEditNotificationBtn');
-        const notificationsList = document.getElementById('notificationsList');
+        // Product Details Page Elements
+        const backToProductsBtn = document.getElementById('backToProductsBtn');
+        const detailsPageTitle = document.getElementById('details-page-title');
+        const detailsImage = document.getElementById('details-image');
+        const detailsName = document.getElementById('details-name');
+        const detailsType = document.getElementById('details-type');
+        const detailsDescription = document.getElementById('details-description');
+        const detailsPrice = document.getElementById('details-price');
+        const detailsAvailability = document.getElementById('details-availability');
+        const addToCartBtn = document.getElementById('addToCartBtn');
 
-        // Test AI elements
-        const testQueryInput = document.getElementById('testQuery');
-        const askLaylaBtn = document.getElementById('askLaylaBtn');
-        const laylaResponseTextarea = document.getElementById('laylaResponse');
+        // Chat Page Elements
+        const chatMessagesContainer = document.getElementById('chat-messages-container');
+        const chatInput = document.getElementById('chat-input');
+        const sendChatBtn = document.getElementById('send-chat-btn');
 
-        // Chat Logs elements - NEW
-        const chatLogsList = document.getElementById('chatLogsList');
-        const chatLogCountSpan = document.getElementById('chatLogCount');
-        const showUnansweredOnlyBtn = document.getElementById('showUnansweredOnlyBtn');
-        const showAllChatsBtn = document.getElementById('showAllChatsBtn');
+        // Cart Page Elements
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        const cartTotalContainer = document.getElementById('cart-total-container');
+        const productsSubtotalDisplay = document.getElementById('products-subtotal');
+        const deliveryCostDisplay = document.getElementById('delivery-cost');
+        const finalTotalDisplay = document.getElementById('final-total');
+        const checkoutBtn = document.getElementById('checkout-btn');
+
+        // Checkout Modal Elements
+        const checkoutModal = document.getElementById('checkout-modal');
+        const closeCheckoutModalBtn = document.getElementById('close-checkout-modal');
+        const checkoutForm = document.getElementById('checkout-form');
+        const governorateSelect = document.getElementById('governorate');
+        const areaInput = document.getElementById('area');
+        const landmarkInput = document.getElementById('landmark');
+        const phoneNumberInput = document.getElementById('phoneNumber');
+        const totalPriceFormInput = document.getElementById('totalPriceForm');
+        const additionalNotesInput = document.getElementById('additionalNotes');
+        const saveAddressCheckbox = document.getElementById('saveAddressCheckbox');
+        const saveAddressTip = document.getElementById('saveAddressTip');
+
+        // Notification Modal Elements
+        const notificationModal = document.getElementById('notification-modal');
+        const closeNotificationModalBtn = document.getElementById('close-notification-modal');
+        const notificationsList = document.getElementById('notifications-list');
+
+        // Privacy Policy Modal Elements
+        const privacyPolicyModal = document.getElementById('privacy-policy-modal');
+        const closePrivacyPolicyModalBtn = document.getElementById('close-privacy-policy-modal');
+
+        // Toast Notification Elements
+        const toastNotification = document.getElementById('toast-notification');
+        const toastTitle = toastNotification.querySelector('.toast-title');
+        const toastContent = toastNotification.querySelector('.toast-content');
+
+
+        // --- Utility Functions ---
 
         /**
-         * Displays a message to the user in the message display area.
-         * @param {string} message - The message to display.
-         * @param {'success'|'error'|'info'} type - The type of message (determines color).
+         * Navigates to a specific page.
+         * @param {HTMLElement} targetPage - The page element to navigate to.
+         * @param {string} title - The title to set for the header.
+         * @param {boolean} [isBack=false] - True if navigating back (for animation).
          */
-        function showMessage(message, type) {
-            messageDisplay.textContent = message;
-            messageDisplay.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-blue-100', 'text-blue-800');
-            if (type === 'success') {
-                messageDisplay.classList.add('bg-green-100', 'text-green-800');
-            } else if (type === 'error') {
-                messageDisplay.classList.add('bg-red-100', 'text-red-800');
-            } else {
-                messageDisplay.classList.add('bg-blue-100', 'text-blue-800');
+        function navigateTo(targetPage, title, isBack = false) {
+            const currentPage = document.querySelector('.page-content.active');
+            if (currentPage === targetPage) return;
+
+            if (currentPage) {
+                currentPage.classList.remove('active');
+                if (!isBack) {
+                    currentPage.classList.add('slide-out');
+                }
+                setTimeout(() => {
+                    currentPage.style.display = 'none';
+                    currentPage.classList.remove('slide-out', 'from-left');
+                }, 300);
             }
-            // Hide message after 5 seconds
+
+            // Always update the header title
+            headerTitle.textContent = title;
+            
+            targetPage.style.display = 'flex';
             setTimeout(() => {
-                messageDisplay.classList.add('hidden');
-            }, 5000);
+                targetPage.classList.add('active');
+                if (isBack) {
+                    targetPage.classList.add('from-left');
+                } else {
+                    targetPage.classList.remove('from-left');
+                }
+            }, 50);
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === targetPage.id) {
+                    item.classList.add('active');
+                }
+            });
+
+            if (targetPage === productDetailsPage) {
+                bottomNav.style.display = 'none';
+            } else {
+                bottomNav.style.display = 'flex';
+            }
         }
 
         /**
-         * Initializes Firebase and handles user authentication.
+         * Simple alert message (replaces alert()).
+         * @param {string} message
+         * @param {'success'|'info'|'error'} type
          */
+        function alertMessage(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.classList.add('fixed', 'top-4', 'left-1/2', '-translate-x-1/2', 'z-[10000]', 'px-4', 'py-2', 'rounded-lg', 'text-white', 'font-semibold', 'shadow-lg');
+            if (type === 'success') {
+                alertDiv.classList.add('bg-green-500');
+            } else if (type === 'info') {
+                alertDiv.classList.add('bg-blue-500');
+            } else {
+                alertDiv.classList.add('bg-red-500');
+            }
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+
+        /**
+         * Shows a modal.
+         * @param {HTMLElement} modalElement
+         */
+        function showModal(modalElement) {
+            modalElement.classList.add('open');
+            modalElement.classList.remove('hidden');
+        }
+
+        /**
+         * Hides a modal.
+         * @param {HTMLElement} modalElement
+         */
+        function hideModal(modalElement) {
+            modalElement.classList.remove('open');
+            setTimeout(() => {
+                modalElement.classList.add('hidden');
+            }, 300); // Match CSS transition duration
+        }
+
+        // --- Firebase Initialization ---
         async function initializeFirebase() {
             try {
-                // Use Canvas provided config if available, otherwise use the hardcoded one
-                const currentFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
-                
-                if (!currentFirebaseConfig.projectId || !currentFirebaseConfig.apiKey || currentFirebaseConfig.apiKey === "YOUR_API_KEY") {
-                    showMessage('خطأ: يرجى تحديث firebaseConfig في الكود الخاص بك بمعلومات مشروع Firebase الفعلية.', 'error');
-                    return;
+                // Use __firebase_config from the Canvas environment if available
+                const canvasFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+                app = initializeApp(canvasFirebaseConfig);
+                db = getFirestore(app);
+
+                // Enable Firebase Offline Persistence
+                try {
+                    await enableIndexedDbPersistence(db);
+                    console.log("Firebase Offline Persistence enabled successfully.");
+                } catch (err) {
+                    if (err.code === 'failed-precondition') {
+                        // Multiple tabs open, persistence can only be enabled in one.
+                        console.warn("Firebase Offline Persistence: Can't enable persistence, likely multiple tabs open.");
+                    } else if (err.code === 'unimplemented') {
+                        // The browser doesn't support all of the features required for persistence.
+                        console.warn("Firebase Offline Persistence: Browser does not support persistence.");
+                    } else {
+                        console.error("Firebase Offline Persistence: Error enabling persistence", err);
+                    }
                 }
 
-                app = initializeApp(currentFirebaseConfig);
-                db = getFirestore(app);
                 auth = getAuth(app);
 
-                console.log("Firebase initialized. Waiting for auth state...");
-
-                // Listen for authentication state changes
                 onAuthStateChanged(auth, async (user) => {
-                    console.log("onAuthStateChanged triggered. User:", user);
                     if (user) {
-                        console.log("User is signed in. Actual Firebase UID:", user.uid);
-
-                        // For this dashboard, we enforce using ADMIN_USER_ID for data storage
-                        userId = ADMIN_USER_ID; 
-                        userIdDisplay.textContent = userId;
-                        showMessage('تم تسجيل الدخول بنجاح. معرف المستخدم (للتخزين): ' + userId, 'success');
-                        
-                        // Check if the authenticated user is the ADMIN_USER_ID
-                        if (user.uid !== ADMIN_USER_ID) {
-                            console.warn("Authenticated UID (" + user.uid + ") does NOT match ADMIN_USER_ID (" + ADMIN_USER_ID + "). Read operations should work (per rules), but write operations (add/update/delete) might fail due to security rules.");
-                            showMessage('تحذير: تم تسجيل الدخول كمستخدم مختلف عن المسؤول. قد لا تتمكن من حفظ التغييرات.', 'info');
-                        }
-                        
-                        // Setup Firestore listeners only after app is initialized AND user is authenticated
+                        clientUserId = user.uid; // Actual client's UID
+                        console.log("Firebase authenticated. Client User ID:", clientUserId);
                         setupFirestoreListeners();
-                        setupChatLogsListener(); // NEW: Call setupChatLogsListener here
                     } else {
-                        console.log("No user signed in. Attempting anonymous sign-in or custom token sign-in.");
                         try {
-                            const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
                             if (initialAuthToken) {
-                                console.log("Attempting signInWithCustomToken with provided token.");
                                 await signInWithCustomToken(auth, initialAuthToken);
                             } else {
-                                console.log("Attempting signInAnonymously.");
                                 await signInAnonymously(auth);
                             }
-                            // onAuthStateChanged will be triggered again with the new user
-                        } catch (anonymousAuthError) {
-                            showMessage(`خطأ في تسجيل الدخول: ${anonymousAuthError.message}`, 'error');
-                            console.error("Authentication error:", anonymousAuthError);
+                            clientUserId = auth.currentUser.uid; // Update after sign-in
+                            console.log("Signed in with:", clientUserId);
+                            setupFirestoreListeners();
+                        } catch (error) {
+                            console.error("Error signing in anonymously:", error);
+                            productsDisplay.innerHTML = '<p class="text-red-500 col-span-full">خطأ في الاتصال بالمتجر. يرجى المحاولة لاحقاً.</p>';
+                            addChatMessage("ليلى", "عذراً، لا أستطيع الاتصال بخدماتي حالياً. يرجى المحاولة مرة أخرى لاحقاً.", 'layla-message');
                         }
                     }
                 });
-
             } catch (error) {
-                showMessage(`خطأ في تهيئة Firebase: ${error.message}`, 'error');
-                console.error("Firebase initialization error:", error);
+                console.error("Error initializing Firebase:", error);
+                productsDisplay.innerHTML = '<p class="text-red-500 col-span-full">خطأ فادح في تهيئة Firebase. يرجى التحقق من الإعدادات.</p>';
+                addChatMessage("ليلى", "عذراً، حدث خطأ فادح في تهيئة خدماتي. يرجى إبلاغ إدارة المتجر.", 'layla-message');
             }
         }
 
         /**
-         * Sets up real-time listeners for Intents, Products, Notes, and Notifications collections.
+         * Sets up real-time listeners for Products, Intents, Notes, and Notifications collections.
          */
         function setupFirestoreListeners() {
-            // Ensure db and userId are available before setting up listeners
-            if (!db || !userId || !auth.currentUser) { 
-                console.warn("Firestore, userId, or authenticated user not fully ready for listeners in setupFirestoreListeners. Skipping.");
+            if (!db || !clientUserId) { // Use clientUserId here
+                console.warn("Firestore or clientUserId not ready for listeners.");
                 return;
             }
-            console.log(`Setting up Firestore listeners for path: artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/...`);
 
-            // Listen for changes in 'store_intents' collection
-            const intentsCollectionRef = collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_intents`);
-            onSnapshot(intentsCollectionRef, (snapshot) => {
-                intentsList.innerHTML = ''; 
-                const intents = [];
-                snapshot.forEach(doc => {
-                    intents.push({ id: doc.id, ...doc.data() });
-                });
-                displayIntents(intents);
-                intentCountSpan.textContent = intents.length;
-                if (intents.length === 0) {
-                    intentsList.innerHTML = '<p class="text-gray-500 text-center">لا توجد نوايا بعد. أضف نية جديدة لتبدأ!</p>';
-                }
-                console.log("Intents fetched successfully.");
-            }, (error) => {
-                showMessage(`خطأ في جلب النوايا: ${error.message}`, 'error');
-                console.error("Error fetching intents:", error);
-            });
-
-            // Listen for changes in 'store_products' collection
-            const productsCollectionRef = collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_products`);
+            // Listen for changes in 'store_products' collection (using ADMIN_USER_ID for data source)
+            const productsCollectionRef = collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${ADMIN_USER_ID}/store_products`);
             onSnapshot(productsCollectionRef, (snapshot) => {
                 allProducts = []; 
                 const productTypes = new Set(); 
@@ -434,873 +1223,728 @@
                         productTypes.add(productData.type);
                     }
                 });
-                populateProductTypeFilter(Array.from(productTypes));
-                filterAndDisplayProducts(); 
-                console.log("Products fetched successfully.");
+                populateProductTypeFilterStore(Array.from(productTypes)); 
+                applyProductFilter(); 
+                console.log("Products updated in real-time.");
             }, (error) => {
-                showMessage(`خطأ في جلب المنتجات: ${error.message}`, 'error');
-                console.error("Error fetching products:", error);
+                console.error("Error fetching products in store:", error);
+                productsDisplay.innerHTML = '<p class="text-red-500 col-span-full">خطأ في جلب المنتجات. يرجى المحاولة لاحقاً.</p>';
             });
 
-            // Listen for changes in 'store_notes' collection
-            const notesCollectionRef = collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_notes`);
+            // Listen for changes in 'store_intents' collection (for Layla's knowledge, using ADMIN_USER_ID)
+            const intentsCollectionRef = collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${ADMIN_USER_ID}/store_intents`);
+            onSnapshot(intentsCollectionRef, (snapshot) => {
+                allIntents = []; 
+                snapshot.forEach(doc => {
+                    allIntents.push({ id: doc.id, ...doc.data() });
+                });
+                console.log("Intents updated in real-time for Layla.");
+            }, (error) => {
+                console.error("Error fetching intents for Layla:", error);
+                addChatMessage("ليلى", "عذراً، لا أستطيع الوصول إلى قاعدة معلوماتي حالياً.", 'layla-message');
+            });
+
+            // Listen for changes in 'store_notes' collection (using ADMIN_USER_ID)
+            const notesCollectionRef = collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${ADMIN_USER_ID}/store_notes`);
             onSnapshot(notesCollectionRef, (snapshot) => {
-                notesList.innerHTML = '';
+                allNotes = [];
                 if (snapshot.empty) {
-                    notesList.innerHTML = '<p class="text-gray-500 text-center">لا توجد ملاحظات حالياً.</p>';
+                    storeNotesDisplay.classList.add('hidden');
+                    storeNotesDisplay.innerHTML = '';
                     return;
                 }
+                storeNotesDisplay.classList.remove('hidden');
+                storeNotesDisplay.innerHTML = ''; 
                 snapshot.forEach(doc => {
-                    const noteData = { id: doc.id, ...doc.data() };
-                    const noteDiv = document.createElement('div');
-                    noteDiv.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-sm', 'border', 'border-gray-200');
-                    noteDiv.innerHTML = `
-                        <h3 class="text-lg font-semibold text-gray-900 mb-1">${noteData.title || 'ملاحظة بدون عنوان'}</h3>
-                        <p class="text-sm text-gray-700 mb-3">${noteData.content}</p>
-                        <div class="flex gap-2">
-                            <button data-id="${noteData.id}" class="edit-note-btn bg-yellow-500 text-white px-3 py-1 rounded-md text-sm hover:bg-yellow-600 transition duration-200">تعديل</button>
-                            <button data-id="${noteData.id}" class="delete-note-btn bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition duration-200">حذف</button>
-                        </div>
-                    `;
-                    notesList.appendChild(noteDiv);
+                    const noteData = doc.data();
+                    allNotes.push(noteData); 
+                    const noteSpan = document.createElement('span');
+                    noteSpan.textContent = `${noteData.title ? noteData.title + ': ' : ''}${noteData.content} --- `;
+                    storeNotesDisplay.appendChild(noteSpan);
                 });
-                document.querySelectorAll('.edit-note-btn').forEach(button => {
-                    button.onclick = (e) => editNote(e.target.dataset.id);
-                });
-                document.querySelectorAll('.delete-note-btn').forEach(button => {
-                    button.onclick = (e) => deleteNote(e.target.dataset.id);
-                });
-                console.log("Notes fetched successfully.");
+                // No animation, just display full text
             }, (error) => {
-                showMessage(`خطأ في جلب الملاحظات: ${error.message}`, 'error');
-                console.error("Error fetching notes:", error);
+                console.error("Error fetching notes for store:", error);
+                storeNotesDisplay.classList.add('hidden');
             });
 
-            // Listen for changes in 'store_notifications' collection
-            const notificationsCollectionRef = collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_notifications`);
+            // Listen for changes in 'store_notifications' collection (using ADMIN_USER_ID)
+            const notificationsCollectionRef = collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${ADMIN_USER_ID}/store_notifications`);
             onSnapshot(notificationsCollectionRef, (snapshot) => {
-                notificationsList.innerHTML = '';
-                if (snapshot.empty) {
-                    notificationsList.innerHTML = '<p class="text-gray-500 text-center">لا توجد إشعارات حالياً.</p>';
-                    return;
-                }
+                let newUnreadCount = 0;
+                let latestNotification = null;
+                let currentNotifications = [];
+
                 snapshot.forEach(doc => {
-                    const notifData = { id: doc.id, ...doc.data() };
-                    const notifDiv = document.createElement('div');
-                    notifDiv.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-sm', 'border', 'border-gray-200');
-                    notifDiv.innerHTML = `
-                        <h3 class="text-lg font-semibold text-gray-900 mb-1">${notifData.title || 'إشعار بدون عنوان'}</h3>
-                        <p class="text-sm text-gray-700 mb-3">${notifData.content}</p>
-                        <div class="flex gap-2">
-                            <button data-id="${notifData.id}" class="edit-notification-btn bg-yellow-500 text-white px-3 py-1 rounded-md text-sm hover:bg-yellow-600 transition duration-200">تعديل</button>
-                            <button data-id="${notifData.id}" class="delete-notification-btn bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition duration-200">حذف</button>
-                        </div>
-                    `;
-                    notificationsList.appendChild(notifDiv);
+                    const notificationData = { id: doc.id, ...doc.data() };
+                    currentNotifications.push(notificationData);
+                    if (!notificationData.read) {
+                        newUnreadCount++;
+                    }
+                    const notifTimestamp = notificationData.createdAt?.toDate ? notificationData.createdAt.toDate().getTime() : new Date(notificationData.createdAt).getTime();
+                    if (notifTimestamp > lastNotificationTimestamp) {
+                        latestNotification = notificationData;
+                        lastNotificationTimestamp = notifTimestamp;
+                    }
                 });
-                document.querySelectorAll('.edit-notification-btn').forEach(button => {
-                    button.onclick = (e) => editNotification(e.target.dataset.id);
-                });
-                document.querySelectorAll('.delete-notification-btn').forEach(button => {
-                    button.onclick = (e) => deleteNotification(e.target.dataset.id);
-                });
-                console.log("Notifications fetched successfully for dashboard.");
+                allNotifications = currentNotifications.sort((a, b) => (b.createdAt?.toDate() || 0) - (a.createdAt?.toDate() || 0)); // Sort by date
+                
+                unreadNotificationsCount = newUnreadCount; // Update global unread count
+                updateNotificationBadge();
+
+                if (latestNotification && !latestNotification.read) { // Only show toast for new unread notifications
+                    showToastNotification(latestNotification.title || 'إشعار جديد', latestNotification.content);
+                }
+                console.log("Notifications updated in real-time.");
             }, (error) => {
-                showMessage(`خطأ في جلب الإشعارات: ${error.message}`, 'error');
                 console.error("Error fetching notifications:", error);
             });
         }
 
-        /**
-         * Sets up real-time listener for 'chat_logs' collection.
-         * NEW FUNCTION FOR CHAT LOGS
-         */
-        function setupChatLogsListener() {
-            // Ensure db and userId are available before setting up listeners
-            if (!db || !userId || !auth.currentUser) { 
-                console.warn("Firestore, userId, or authenticated user not fully ready for chat logs listener. Skipping setup.");
-                return;
-            }
-            console.log(`Setting up Firestore listener for chat logs path: artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/chat_logs`);
-
-            const chatLogsCollectionRef = collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/chat_logs`);
-            onSnapshot(chatLogsCollectionRef, (snapshot) => {
-                allChatLogs = [];
-                snapshot.forEach(doc => {
-                    allChatLogs.push({ id: doc.id, ...doc.data() });
-                });
-                // Display all by default when initially loaded or updated
-                displayChatLogs(allChatLogs); 
-                console.log("Chat logs fetched successfully.");
-            }, (error) => {
-                showMessage(`خطأ في جلب سجلات الدردشة: ${error.message}`, 'error');
-                console.error("Error fetching chat logs:", error);
-            });
-        }
-
-        /**
-         * Displays the list of chat logs in the UI.
-         * @param {Array<Object>} logs - Array of chat log objects from Firestore.
-         * NEW FUNCTION FOR CHAT LOGS
-         */
-        function displayChatLogs(logs) {
-            chatLogsList.innerHTML = ''; // Clear current list
-            chatLogCountSpan.textContent = logs.length; // Update count
-
-            if (logs.length === 0) {
-                chatLogsList.innerHTML = '<p class="text-gray-500 text-center">لا توجد سجلات دردشة لعرضها بعد.</p>';
-                return;
-            }
-
-            // Sort logs by timestamp (newest first)
-            logs.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
-
-            logs.forEach(log => {
-                const logDiv = document.createElement('div');
-                logDiv.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-sm', 'border', 'border-gray-200');
-                
-                let statusClass = 'text-green-600'; // Default for answered
-                let statusText = 'تم الرد';
-                if (log.unanswered) { // Assuming a boolean field 'unanswered' in your log
-                    statusClass = 'text-red-600';
-                    statusText = 'لم يتم الرد (يحتاج مراجعة)';
-                }
-
-                // Format timestamp for display
-                const logTime = log.timestamp ? new Date(log.timestamp.toDate()).toLocaleString('ar-EG', {
-                    year: 'numeric', month: 'short', day: 'numeric',
-                    hour: '2-digit', minute: '2-digit', second: '2-digit'
-                }) : 'غير معروف';
-
-                logDiv.innerHTML = `
-                    <p class="text-sm text-gray-500 mb-1">
-                        <span class="font-semibold">الوقت:</span> ${logTime}
-                    </p>
-                    <p class="text-base font-semibold text-gray-900 mb-2">
-                        <span class="font-semibold">سؤال المستخدم:</span> ${log.userQuery}
-                    </p>
-                    <p class="text-sm text-gray-700 mb-2">
-                        <span class="font-semibold">استجابة ليلى:</span> ${log.laylaResponse}
-                    </p>
-                    <p class="text-xs ${statusClass} font-semibold">
-                        الحالة: ${statusText}
-                    </p>
-                `;
-                chatLogsList.appendChild(logDiv);
-            });
-        }
-
-        // Event Listeners for chat log filter buttons - NEW
-        showUnansweredOnlyBtn.onclick = () => {
-            const unansweredLogs = allChatLogs.filter(log => log.unanswered);
-            displayChatLogs(unansweredLogs);
-            showUnansweredOnlyBtn.classList.add('hidden');
-            showAllChatsBtn.classList.remove('hidden');
-        };
-
-        showAllChatsBtn.onclick = () => {
-            displayChatLogs(allChatLogs);
-            showAllChatsBtn.classList.add('hidden');
-            showUnansweredOnlyBtn.classList.remove('hidden');
-        };
-
+        // --- Product Display & Filtering ---
         /**
          * Populates the product type filter dropdown.
          * @param {string[]} types - Array of unique product types.
          */
-        function populateProductTypeFilter(types) {
-            productTypeFilter.innerHTML = '<option value="">جميع الأنواع</option>';
+        function populateProductTypeFilterStore(types) {
+            productTypeFilterStore.innerHTML = '<option value="">جميع الأنواع</option>';
             types.sort().forEach(type => {
                 const option = document.createElement('option');
                 option.value = type;
                 option.textContent = type;
-                productTypeFilter.appendChild(option);
+                productTypeFilterStore.appendChild(option);
             });
-            // Restore selected filter if it was set
-            if (productTypeFilter.dataset.currentFilter) {
-                productTypeFilter.value = productTypeFilter.dataset.currentFilter;
+            if (productTypeFilterStore.dataset.currentFilter) {
+                productTypeFilterStore.value = productTypeFilterStore.dataset.currentFilter;
             }
         }
 
         /**
-         * Filters and displays products based on the selected type.
+         * Applies the selected filter (all, offers, or specific type) and displays products.
          */
-        function filterAndDisplayProducts() {
-            productsList.innerHTML = ''; // Clear current list
-            const selectedType = productTypeFilter.value;
-            productTypeFilter.dataset.currentFilter = selectedType; // Store current filter
+        function applyProductFilter() {
+            let productsToDisplay = allProducts;
+            const searchTerm = productSearchInput.value.toLowerCase();
 
-            const filteredProducts = selectedType
-                ? allProducts.filter(product => product.type === selectedType)
-                : allProducts;
+            if (currentFilter === 'offers') {
+                productsToDisplay = allProducts.filter(product => product.isOffer === true);
+            } else if (currentFilter !== 'all' && currentFilter !== '') {
+                productsToDisplay = allProducts.filter(product => product.type === currentFilter);
+            }
+            
+            // Apply search term filter
+            if (searchTerm) {
+                productsToDisplay = productsToDisplay.filter(product => 
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.description.toLowerCase().includes(searchTerm) ||
+                    (product.type && product.type.toLowerCase().includes(searchTerm))
+                );
+            }
 
-            displayProducts(filteredProducts);
-            productCountSpan.textContent = filteredProducts.length;
+            displayProducts(productsToDisplay);
 
-            if (filteredProducts.length === 0) {
-                productsList.innerHTML = '<p class="text-gray-500 text-center">لا توجد منتجات مطابقة لهذا النوع.</p>';
+            if (productsToDisplay.length === 0) {
+                productsDisplay.innerHTML = `<p class="text-center text-gray-500 w-full">لا توجد منتجات ${currentFilter === 'offers' ? 'ضمن العروض' : currentFilter === 'all' ? 'لعرضها حالياً' : `من نوع "${currentFilter}"`} حالياً.</p>`;
             }
         }
 
         /**
-         * Displays the list of intents in the UI.
-         * @param {Array<Object>} intents - Array of intent objects from Firestore.
-         */
-        function displayIntents(intents) {
-            intentsList.innerHTML = '';
-            intents.forEach(intent => {
-                const intentDiv = document.createElement('div');
-                intentDiv.id = `intent-${intent.id}`;
-                intentDiv.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-sm', 'border', 'border-gray-200');
-                intentDiv.innerHTML = `
-                    <h3 class="text-lg font-semibold text-gray-900 mb-1">${intent.name}</h3>
-                    <p class="text-sm text-gray-600 mb-2"><strong>عبارات التدريب:</strong> ${intent.trainingPhrases.join(', ')}</p>
-                    <p class="text-sm text-gray-700 mb-3"><strong>المخرج:</strong> ${intent.output}</p>
-                    <div class="flex gap-2">
-                        <button data-id="${intent.id}" class="edit-intent-btn bg-yellow-500 text-white px-3 py-1 rounded-md text-sm hover:bg-yellow-600 transition duration-200">تعديل</button>
-                        <button data-id="${intent.id}" class="delete-intent-btn bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition duration-200">حذف</button>
-                    </div>
-                `;
-                intentsList.appendChild(intentDiv);
-            });
-
-            // Add event listeners to new buttons
-            document.querySelectorAll('.edit-intent-btn').forEach(button => {
-                button.onclick = (e) => editIntent(e.target.dataset.id);
-            });
-            document.querySelectorAll('.delete-intent-btn').forEach(button => {
-                button.onclick = (e) => deleteIntent(e.target.dataset.id);
-            });
-        }
-
-        /**
-         * Displays the list of products in the UI.
-         * @param {Array<Object>} products - Array of product objects from Firestore.
+         * Displays products on the store front-end.
+         * @param {Array<Object>} products - Array of product objects.
          */
         function displayProducts(products) {
-            productsList.innerHTML = '';
+            productsDisplay.innerHTML = ''; 
+            if (products.length === 0) {
+                return;
+            }
+            
+            // Display products in two columns
             products.forEach(product => {
-                const productDiv = document.createElement('div');
-                productDiv.id = `product-${product.id}`;
-                productDiv.classList.add('bg-white', 'p-4', 'rounded-lg', 'shadow-sm', 'border', 'border-gray-200');
-                productDiv.innerHTML = `
-                    <h3 class="text-lg font-semibold text-gray-900 mb-1">${product.name}</h3>
-                    <p class="text-sm text-gray-600 mb-1"><strong>النوع:</strong> ${product.type || 'غير محدد'}</p>
-                    <p class="text-sm text-gray-700 mb-1"><strong>الوصف:</strong> ${product.description}</p>
-                    <p class="text-sm text-gray-700 mb-1"><strong>الصورة:</strong> ${product.imageUrl ? `<a href="${product.imageUrl}" target="_blank" class="text-blue-500 hover:underline">عرض الصورة</a>` : 'لا توجد'}</p>
-                    <p class="text-sm text-gray-700 mb-1"><strong>السعر:</strong> ${product.price}</p>
-                    <p class="text-sm ${product.availability === 'متوفر' ? 'text-green-600' : product.availability === 'غير متوفر' ? 'text-red-600' : 'text-blue-600'} font-medium mb-1">
-                        <strong>التوفر:</strong> ${product.availability}
-                    </p>
-                    <p class="text-sm text-gray-700 mb-3">
-                        <strong>عرض خاص:</strong> ${product.isOffer ? 'نعم' : 'لا'}
-                    </p>
-                    <div class="flex gap-2">
-                        <button data-id="${product.id}" class="edit-product-btn bg-yellow-500 text-white px-3 py-1 rounded-md text-sm hover:bg-yellow-600 transition duration-200">تعديل</button>
-                        <button data-id="${product.id}" class="delete-product-btn bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600 transition duration-200">حذف</button>
+                const productCard = document.createElement('div');
+                productCard.classList.add('product-card');
+                productCard.innerHTML = `
+                    <img src="${product.imageUrl || `https://placehold.co/300x300/e0e0e0/000?text=${product.name}`}" alt="${product.name}" onerror="this.onerror=null;this.src='https://placehold.co/300x300/e0e0e0/000?text=صورة+غير+متوفرة';">
+                    <div class="product-card-info">
+                        <h3>${product.name}</h3>
+                        <p class="price">${parseFloat(product.price).toFixed(0)} IQD</p>
+                        <span class="availability ${
+                            product.availability === 'متوفر' ? 'bg-green-100 text-green-800' :
+                            product.availability === 'غير متوفر' ? 'bg-red-100 text-red-800' :
+                            'bg-blue-100 text-blue-800'
+                        }">
+                            ${product.availability}
+                        </span>
+                        <div class="buttons-container">
+                            <button data-id="${product.id}" class="view-details-btn">التفاصيل</button>
+                            <button data-id="${product.id}" class="add-to-cart-btn-card"><i class="fas fa-cart-plus"></i></button>
+                        </div>
                     </div>
                 `;
-                productsList.appendChild(productDiv);
+                productsDisplay.appendChild(productCard);
             });
 
-            // Add event listeners to new buttons
-            document.querySelectorAll('.edit-product-btn').forEach(button => {
-                button.onclick = (e) => editProduct(e.target.dataset.id);
+            document.querySelectorAll('.view-details-btn').forEach(button => {
+                button.onclick = (e) => showProductDetails(e.target.dataset.id);
             });
-            document.querySelectorAll('.delete-product-btn').forEach(button => {
-                button.onclick = (e) => deleteProduct(e.target.dataset.id);
+            document.querySelectorAll('.add-to-cart-btn-card').forEach(button => {
+                button.onclick = (e) => {
+                    const productId = e.target.dataset.id || e.target.closest('button').dataset.id;
+                    const productToAdd = allProducts.find(p => p.id === productId);
+                    if (productToAdd) {
+                        addProductToCart(productToAdd);
+                    }
+                };
             });
         }
 
         /**
-         * Adds a new intent to Firestore.
+         * Shows the product details page with the given product's information.
+         * @param {string} productId - The ID of the product to display.
          */
-        addIntentBtn.onclick = async () => {
-            const name = intentNameInput.value.trim();
-            const trainingPhrasesText = trainingPhrasesInput.value.trim();
-            const output = intentOutputInput.value.trim();
-
-            if (!name || !trainingPhrasesText || !output) {
-                showMessage('الرجاء ملء جميع حقول النية.', 'error');
-                return;
+        function showProductDetails(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (product) {
+                detailsPageTitle.textContent = product.name; 
+                detailsImage.src = product.imageUrl || `https://placehold.co/300x300/e0e0e0/000?text=${product.name}`;
+                detailsImage.onerror = function() { this.onerror=null; this.src='https://placehold.co/300x300/e0e0e0/000?text=صورة+غير+متوفرة'; }; 
+                detailsName.textContent = product.name;
+                detailsType.textContent = `النوع: ${product.type || 'غير محدد'}`;
+                detailsDescription.textContent = product.description;
+                detailsPrice.textContent = `${parseFloat(product.price).toFixed(0)} IQD`;
+                detailsAvailability.textContent = `التوفر: ${product.availability}`;
+                detailsAvailability.className = `availability ${
+                    product.availability === 'متوفر' ? 'bg-green-100 text-green-800' :
+                    product.availability === 'غير متوفر' ? 'bg-red-100 text-red-800' :
+                    'bg-blue-100 text-blue-800'
+                }`;
+                addToCartBtn.onclick = () => addProductToCart(product); 
+                navigateTo(productDetailsPage, product.name); 
             }
+        }
 
-            const trainingPhrases = trainingPhrasesText.split(/[\n,]+/).map(phrase => phrase.trim()).filter(phrase => phrase !== '');
-
-            try {
-                await addDoc(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_intents`), {
-                    name,
-                    trainingPhrases,
-                    output,
-                    createdAt: new Date()
-                });
-                showMessage('تمت إضافة النية بنجاح!', 'success');
-                // Clear form
-                intentNameInput.value = '';
-                trainingPhrasesInput.value = '';
-                intentOutputInput.value = '';
-            } catch (e) {
-                showMessage(`خطأ في إضافة النية: ${e.message}`, 'error');
-                console.error("Error adding intent:", e);
+        // --- Cart Logic ---
+        /**
+         * Adds a product to the cart.
+         * @param {Object} product - The product object to add.
+         */
+        function addProductToCart(product) {
+            const existingItem = cartItems.find(item => item.id === product.id);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cartItems.push({ ...product, quantity: 1 });
             }
-        };
+            updateCartDisplay();
+            alertMessage('تمت إضافة المنتج إلى السلة!', 'success');
+        }
 
         /**
-         * Populates the intent form for editing.
-         * @param {string} id - The ID of the intent to edit.
+         * Removes a product from the cart.
+         * @param {string} productId - The ID of the product to remove.
          */
-        async function editIntent(id) {
-            try {
-                const docRef = doc(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_intents`, id);
-                const docSnap = await getDoc(docRef);
+        function removeProductFromCart(productId) {
+            cartItems = cartItems.filter(item => item.id !== productId);
+            updateCartDisplay();
+            alertMessage('تم حذف المنتج من السلة.', 'info');
+        }
 
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    intentNameInput.value = data.name;
-                    trainingPhrasesInput.value = data.trainingPhrases.join(', ');
-                    intentOutputInput.value = data.output;
-                    editingIntentId = id; // Set the ID of the intent being edited
-
-                    // Show update/cancel buttons, hide add button
-                    addIntentBtn.classList.add('hidden');
-                    updateIntentBtn.classList.remove('hidden');
-                    cancelEditIntentBtn.classList.remove('hidden');
-                    showMessage('يمكنك الآن تعديل النية.', 'info');
+        /**
+         * Updates quantity of a product in the cart.
+         * @param {string} productId - The ID of the product.
+         * @param {number} delta - Change in quantity (+1 or -1).
+         */
+        function updateCartItemQuantity(productId, delta) {
+            const item = cartItems.find(i => i.id === productId);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    removeProductFromCart(productId);
                 } else {
-                    showMessage('النية غير موجودة.', 'error');
+                    updateCartDisplay();
                 }
-            } catch (e) {
-                showMessage(`خطأ في جلب النية للتعديل: ${e.message}`, 'error');
-                console.error("Error fetching intent for edit:", e);
             }
         }
 
         /**
-         * Updates an existing intent in Firestore.
+         * Calculates delivery cost based on product types and governorate.
+         * @param {string} governorate - The selected governorate.
+         * @returns {number} The delivery cost.
          */
-        updateIntentBtn.onclick = async () => {
-            if (!editingIntentId) {
-                showMessage('لا توجد نية لتحديثها.', 'error');
-                return;
-            }
+        function calculateDeliveryCost(governorate) {
+            let hasBooks = false;
+            let hasOtherProducts = false;
 
-            const name = intentNameInput.value.trim();
-            const trainingPhrasesText = trainingPhrasesInput.value.trim();
-            const output = intentOutputInput.value.trim();
-
-            if (!name || !trainingPhrasesText || !output) {
-                showMessage('الرجاء ملء جميع حقول النية.', 'error');
-                return;
-            }
-
-            const trainingPhrases = trainingPhrasesText.split(/[\n,]+/).map(phrase => phrase.trim()).filter(phrase => phrase !== '');
-
-            try {
-                const docRef = doc(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_intents`, editingIntentId);
-                await updateDoc(docRef, {
-                    name,
-                    trainingPhrases,
-                    output,
-                    updatedAt: new Date()
-                });
-                showMessage('تم تحديث النية بنجاح!', 'success');
-                cancelEditIntent(); // Reset form state
-            } catch (e) {
-                showMessage(`خطأ في تحديث النية: ${e.message}`, 'error');
-                console.error("Error updating intent:", e);
-            }
-        };
-
-        /**
-         * Resets the intent form and hides update/cancel buttons.
-         */
-        cancelEditIntentBtn.onclick = cancelEditIntent;
-        function cancelEditIntent() {
-            intentNameInput.value = '';
-            trainingPhrasesInput.value = '';
-            intentOutputInput.value = '';
-            editingIntentId = null;
-            addIntentBtn.classList.remove('hidden');
-            updateIntentBtn.classList.add('hidden');
-            cancelEditIntentBtn.classList.add('hidden');
-            showMessage('تم إلغاء التعديل.', 'info');
-        }
-
-        /**
-         * Deletes an intent from Firestore.
-         * @param {string} id - The ID of the intent to delete.
-         */
-        async function deleteIntent(id) {
-            // In a real app, you might want a confirmation dialog here.
-            try {
-                const docRef = doc(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_intents`, id);
-                await deleteDoc(docRef);
-                showMessage('تم حذف النية بنجاح!', 'success');
-                if (editingIntentId === id) { // If deleting the one being edited
-                    cancelEditIntent();
-                }
-            } catch (e) {
-                showMessage(`خطأ في حذف النية: ${e.message}`, 'error');
-                console.error("Error deleting intent:", e);
-            }
-        }
-
-        /**
-         * Adds a new product to Firestore.
-         */
-        addProductBtn.onclick = async () => {
-            const name = productNameInput.value.trim();
-            const type = productTypeInput.value.trim();
-            const description = productDescriptionInput.value.trim();
-            const imageUrl = productImageUrlInput.value.trim(); 
-            const price = productPriceInput.value.trim();
-            const availability = productAvailabilitySelect.value;
-            const isOffer = productIsOfferCheckbox.checked; 
-
-            if (!name || !description || !price || !availability) {
-                showMessage('الرجاء ملء جميع حقول المنتج الأساسية.', 'error');
-                return;
-            }
-
-            try {
-                await addDoc(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_products`), {
-                    name,
-                    type,
-                    description,
-                    imageUrl, 
-                    price,
-                    availability,
-                    isOffer, 
-                    createdAt: new Date()
-                });
-                showMessage('تمت إضافة المنتج بنجاح!', 'success');
-                // Clear form
-                productNameInput.value = '';
-                productTypeInput.value = '';
-                productDescriptionInput.value = '';
-                productImageUrlInput.value = '';
-                productPriceInput.value = '';
-                productAvailabilitySelect.value = 'متوفر';
-                productIsOfferCheckbox.checked = false; 
-            } catch (e) {
-                showMessage(`خطأ في إضافة المنتج: ${e.message}`, 'error');
-                console.error("Error adding product:", e);
-            }
-        };
-
-        /**
-         * Populates the product form for editing.
-         * @param {string} id - The ID of the product to edit.
-         */
-        async function editProduct(id) {
-            try {
-                const docRef = doc(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_products`, id);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    productNameInput.value = data.name;
-                    productTypeInput.value = data.type || '';
-                    productDescriptionInput.value = data.description;
-                    productImageUrlInput.value = data.imageUrl || ''; 
-                    productPriceInput.value = data.price;
-                    productAvailabilitySelect.value = data.availability;
-                    productIsOfferCheckbox.checked = data.isOffer || false; 
-                    editingProductId = id; 
-
-                    addProductBtn.classList.add('hidden'); 
-                    updateProductBtn.classList.remove('hidden');
-                    cancelEditProductBtn.classList.remove('hidden');
-                    showMessage('يمكنك الآن تعديل المنتج.', 'info');
+            cartItems.forEach(item => {
+                if (item.type && (item.type.toLowerCase().includes('كتاب') || item.type.toLowerCase().includes('رواية') || item.type.toLowerCase().includes('أدبي'))) {
+                    hasBooks = true;
                 } else {
-                    showMessage('المنتج غير موجود.', 'error');
+                    hasOtherProducts = true;
                 }
-            } catch (e) {
-                showMessage(`خطأ في جلب المنتج للتعديل: ${e.message}`, 'error');
-                console.error("Error fetching product for edit:", e);
-            }
+            });
+
+            // Books delivery logic
+            if (hasBooks && governorate === 'البصرة') return 3000;
+            if (hasBooks && governorate !== 'البصرة' && governorate !== '') return 5000;
+
+            // Other products delivery logic
+            if (hasOtherProducts && governorate === 'الناصرية') return 3000;
+            if (hasOtherProducts && governorate !== 'الناصرية' && governorate !== '') return 5000;
+            
+            return 0; 
         }
 
         /**
-         * Updates an existing product in Firestore.
+         * Updates the cart display and total.
          */
-        updateProductBtn.onclick = async () => {
-            if (!editingProductId) {
-                showMessage('لا يوجد منتج لتحديثه.', 'error');
-                return;
-            }
+        function updateCartDisplay() {
+            cartItemsContainer.innerHTML = '';
+            let productsSubtotal = 0;
+            let deliveryCost = 0;
+            const selectedGovernorate = governorateSelect.value; 
 
-            const name = productNameInput.value.trim();
-            const type = productTypeInput.value.trim();
-            const description = productDescriptionInput.value.trim();
-            const imageUrl = productImageUrlInput.value.trim(); 
-            const price = productPriceInput.value.trim();
-            const availability = productAvailabilitySelect.value;
-            const isOffer = productIsOfferCheckbox.checked; 
+            if (cartItems.length === 0) {
+                cartItemsContainer.innerHTML = '<p class="text-center text-gray-500">سلتك فارغة حالياً.</p>';
+            } else {
+                cartItems.forEach(item => {
+                    const itemPrice = parseFloat(item.price.replace(/[^0-9.-]+/g,"")); 
+                    productsSubtotal += itemPrice * item.quantity;
 
-            if (!name || !description || !price || !availability) {
-                showMessage('الرجاء ملء جميع حقول المنتج الأساسية.', 'error');
-                return;
-            }
-
-            try {
-                const docRef = doc(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_products`, editingProductId);
-                await updateDoc(docRef, {
-                    name,
-                    type,
-                    description,
-                    imageUrl, 
-                    price,
-                    availability,
-                    isOffer, 
-                    updatedAt: new Date()
+                    const cartItemDiv = document.createElement('div');
+                    cartItemDiv.classList.add('cart-item');
+                    cartItemDiv.innerHTML = `
+                        <img src="${item.imageUrl || `https://placehold.co/60x60/e0e0e0/000?text=${item.name}`}" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/60x60/e0e0e0/000?text=صورة';">
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <p>${item.price} IQD x ${item.quantity}</p>
+                        </div>
+                        <div class="quantity-controls">
+                            <button data-id="${item.id}" data-delta="-1">-</button>
+                            <span>${item.quantity}</span>
+                            <button data-id="${item.id}" data-delta="1">+</button>
+                        </div>
+                        <button data-id="${item.id}" class="remove-btn"><i class="fas fa-trash"></i></button>
+                    `;
+                    cartItemsContainer.appendChild(cartItemDiv);
                 });
-                showMessage('تم تحديث المنتج بنجاح!', 'success');
-                cancelEditProduct(); 
-            } catch (e) {
-                showMessage(`خطأ في تحديث المنتج: ${e.message}`, 'error');
-                console.error("Error updating product:", e);
             }
-        };
 
+            deliveryCost = calculateDeliveryCost(selectedGovernorate);
+            const finalTotal = productsSubtotal + deliveryCost;
+
+            productsSubtotalDisplay.textContent = `${productsSubtotal.toFixed(0)} IQD`; 
+            deliveryCostDisplay.textContent = `${deliveryCost.toFixed(0)} IQD`;
+            finalTotalDisplay.textContent = `${finalTotal.toFixed(0)} IQD`;
+            totalPriceFormInput.value = finalTotal.toFixed(0); 
+
+            document.querySelectorAll('.remove-btn').forEach(button => {
+                button.onclick = (e) => removeProductFromCart(e.target.dataset.id || e.target.closest('button').dataset.id);
+            });
+            document.querySelectorAll('.quantity-controls button').forEach(button => {
+                button.onclick = (e) => {
+                    const productId = e.target.dataset.id || e.target.closest('button').dataset.id;
+                    const delta = parseInt(e.target.dataset.delta);
+                    updateCartItemQuantity(productId, delta);
+                };
+            });
+        }
+
+        // --- Layla Chat Logic ---
         /**
-         * Resets the product form and hides update/cancel buttons.
+         * Layla's AI logic to respond to user queries in the chat.
+         * This function is now enhanced to log interactions to Firestore.
+         * @param {string} queryText - The user's query.
          */
-        cancelEditProductBtn.onclick = cancelEditProduct;
-        function cancelEditProduct() {
-            productNameInput.value = '';
-            productTypeInput.value = '';
-            productDescriptionInput.value = '';
-            productImageUrlInput.value = ''; 
-            productPriceInput.value = '';
-            productAvailabilitySelect.value = 'متوفر';
-            productIsOfferCheckbox.checked = false; 
-            editingProductId = null;
-            addProductBtn.classList.remove('hidden');
-            updateProductBtn.classList.add('hidden');
-            cancelEditProductBtn.classList.add('hidden');
-            showMessage('تم إلغاء التعديل.', 'info');
-        }
-
-        /**
-         * Deletes a product from Firestore.
-         * @param {string} id - The ID of the product to delete.
-         */
-        async function deleteProduct(id) {
-            // In a real app, you might want a confirmation dialog here.
-            try {
-                const docRef = doc(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_products`, id);
-                await deleteDoc(docRef);
-                showMessage('تم حذف المنتج بنجاح!', 'success');
-                if (editingProductId === id) { 
-                    cancelEditProduct();
-                }
-            } catch (e) {
-                showMessage(`خطأ في حذف المنتج: ${e.message}`, 'error');
-                console.error("Error deleting product:", e);
-            }
-        }
-
-        // --- Store Notes Logic ---
-        addNoteBtn.onclick = async () => {
-            const title = noteTitleInput.value.trim();
-            const content = noteContentInput.value.trim();
-
-            if (!content) {
-                showMessage('الرجاء ملء محتوى الملاحظة.', 'error');
-                return;
-            }
+        async function getLaylaResponse(queryText) {
+            const lowerCaseQuery = queryText.toLowerCase();
+            let response = 'عذراً، لم أفهم سؤالك. هل يمكنك إعادة الصياغة؟';
+            let intentIdentified = 'عدم_فهم';
+            let isUnanswered = true;
 
             try {
-                await addDoc(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_notes`), {
-                    title: title || 'ملاحظة بدون عنوان',
-                    content,
-                    createdAt: new Date()
-                });
-                showMessage('تمت إضافة الملاحظة بنجاح!', 'success');
-                noteTitleInput.value = '';
-                noteContentInput.value = '';
-            } catch (e) {
-                showMessage(`خطأ في إضافة الملاحظة: ${e.message}`, 'error');
-                console.error("Error adding note:", e);
-            }
-        };
-
-        async function editNote(id) {
-            try {
-                const docRef = doc(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_notes`, id);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    noteTitleInput.value = data.title || '';
-                    noteContentInput.value = data.content;
-                    editingNoteId = id;
-
-                    addNoteBtn.classList.add('hidden');
-                    updateNoteBtn.classList.remove('hidden');
-                    cancelEditNoteBtn.classList.remove('hidden');
-                    showMessage('يمكنك الآن تعديل الملاحظة.', 'info');
-                } else {
-                    showMessage('الملاحظة غير موجودة.', 'error');
-                }
-            } catch (e) {
-                showMessage(`خطأ في جلب الملاحظة للتعديل: ${e.message}`, 'error');
-                console.error("Error fetching note for edit:", e);
-            }
-        }
-
-        updateNoteBtn.onclick = async () => {
-            if (!editingNoteId) {
-                showMessage('لا توجد ملاحظة لتحديثها.', 'error');
-                return;
-            }
-
-            const title = noteTitleInput.value.trim();
-            const content = noteContentInput.value.trim();
-
-            if (!content) {
-                showMessage('الرجاء ملء محتوى الملاحظة.', 'error');
-                return;
-            }
-
-            try {
-                const docRef = doc(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_notes`, editingNoteId);
-                await updateDoc(docRef, {
-                    title: title || 'ملاحظة بدون عنوان',
-                    content,
-                    updatedAt: new Date()
-                });
-                showMessage('تم تحديث الملاحظة بنجاح!', 'success');
-                cancelEditNote();
-            } catch (e) {
-                showMessage(`خطأ في تحديث الملاحظة: ${e.message}`, 'error');
-                console.error("Error updating note:", e);
-            }
-        };
-
-        cancelEditNoteBtn.onclick = cancelEditNote;
-        function cancelEditNote() {
-            noteTitleInput.value = '';
-            noteContentInput.value = '';
-            editingNoteId = null;
-            addNoteBtn.classList.remove('hidden');
-            updateNoteBtn.classList.add('hidden');
-            cancelEditNoteBtn.classList.add('hidden');
-            showMessage('تم إلغاء التعديل.', 'info');
-        }
-
-        async function deleteNote(id) {
-            try {
-                const docRef = doc(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_notes`, id);
-                await deleteDoc(docRef);
-                showMessage('تم حذف الملاحظة بنجاح!', 'success');
-                if (editingNoteId === id) {
-                    cancelEditNote();
-                }
-            } catch (e) {
-                showMessage(`خطأ في حذف الملاحظة: ${e.message}`, 'error');
-                console.error("Error deleting note:", e);
-            }
-        }
-
-        // --- Notifications Management Logic ---
-        addNotificationBtn.onclick = async () => {
-            const title = notificationTitleInput.value.trim();
-            const content = notificationContentInput.value.trim();
-
-            if (!title || !content) {
-                showMessage('الرجاء ملء عنوان ومحتوى الإشعار.', 'error');
-                return;
-            }
-
-            try {
-                await addDoc(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_notifications`), {
-                    title,
-                    content,
-                    read: false, 
-                    createdAt: new Date()
-                });
-                showMessage('تم إرسال الإشعار بنجاح!', 'success');
-                notificationTitleInput.value = '';
-                notificationContentInput.value = '';
-            } catch (e) {
-                showMessage(`خطأ في إرسال الإشعار: ${e.message}`, 'error');
-                console.error("Error adding notification:", e);
-            }
-        };
-
-        async function editNotification(id) {
-            try {
-                const docRef = doc(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_notifications`, id);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    notificationTitleInput.value = data.title || '';
-                    notificationContentInput.value = data.content;
-                    editingNotificationId = id;
-
-                    addNotificationBtn.classList.add('hidden');
-                    updateNotificationBtn.classList.remove('hidden');
-                    cancelEditNotificationBtn.classList.remove('hidden');
-                    showMessage('يمكنك الآن تعديل الإشعار.', 'info');
-                } else {
-                    showMessage('الإشعار غير موجود.', 'error');
-                }
-            } catch (e) {
-                showMessage(`خطأ في جلب الإشعار للتعديل: ${e.message}`, 'error');
-                console.error("Error fetching notification for edit:", e);
-            }
-        }
-
-        updateNotificationBtn.onclick = async () => {
-            if (!editingNotificationId) {
-                showMessage('لا يوجد إشعار لتحديثه.', 'error');
-                return;
-            }
-
-            const title = notificationTitleInput.value.trim();
-            const content = notificationContentInput.value.trim();
-
-            if (!title || !content) {
-                showMessage('الرجاء ملء عنوان ومحتوى الإشعار.', 'error');
-                return;
-            }
-
-            try {
-                const docRef = doc(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_notifications`, editingNotificationId);
-                await updateDoc(docRef, {
-                    title,
-                    content,
-                    updatedAt: new Date()
-                });
-                showMessage('تم تحديث الإشعار بنجاح!', 'success');
-                cancelEditNotification();
-            } catch (e) {
-                showMessage(`خطأ في تحديث الإشعار: ${e.message}`, 'error');
-                console.error("Error updating notification:", e);
-            }
-        };
-
-        cancelEditNotificationBtn.onclick = cancelEditNotification;
-        function cancelEditNotification() {
-            notificationTitleInput.value = '';
-            notificationContentInput.value = '';
-            editingNotificationId = null;
-            addNotificationBtn.classList.remove('hidden');
-            updateNotificationBtn.classList.add('hidden');
-            cancelEditNotificationBtn.classList.add('hidden');
-            showMessage('تم إلغاء التعديل.', 'info');
-        }
-
-        async function deleteNotification(id) {
-            try {
-                const docRef = doc(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_notifications`, id);
-                await deleteDoc(docRef);
-                showMessage('تم حذف الإشعار بنجاح!', 'success');
-                if (editingNotificationId === id) {
-                    cancelEditNotification();
-                }
-            } catch (e) {
-                showMessage(`خطأ في حذف الإشعار: ${e.message}`, 'error');
-                console.error("Error deleting notification:", e);
-            }
-        }
-
-        /**
-         * Layla's AI logic to respond to user queries.
-         */
-        askLaylaBtn.onclick = async () => {
-            const queryText = testQueryInput.value.trim().toLowerCase();
-            if (!queryText) {
-                laylaResponseTextarea.value = 'الرجاء كتابة سؤال لاختبار ليلى.';
-                return;
-            }
-
-            laylaResponseTextarea.value = 'ليلى تفكر...';
-
-            try {
-                // Fetch current intents and products (though onSnapshot keeps them updated, a direct fetch ensures latest state for this single query)
-                const intentsSnapshot = await getDocs(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_intents`));
-                const currentIntents = intentsSnapshot.docs.map(doc => doc.data());
-
-                const productsSnapshot = await getDocs(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/store_products`));
-                const currentProducts = productsSnapshot.docs.map(doc => doc.data());
-
-                let response = 'عذراً، لم أفهم سؤالك. هل يمكنك إعادة الصياغة؟'; // Default response
-                let answeredSuccessfully = false; // Flag to track if Layla answered
-
                 // 1. Try to match an Intent
-                for (const intent of currentIntents) {
+                for (const intent of allIntents) {
                     const trainingPhrases = intent.trainingPhrases.map(p => p.toLowerCase());
-                    if (trainingPhrases.some(phrase => queryText.includes(phrase))) {
+                    if (trainingPhrases.some(phrase => lowerCaseQuery.includes(phrase))) {
                         response = intent.output;
-                        answeredSuccessfully = true;
+                        intentIdentified = intent.name;
+                        isUnanswered = false;
                         break;
                     }
                 }
 
                 // 2. If no intent matched, try to match a Product
-                if (!answeredSuccessfully) { 
-                    if (response === 'عذراً، لم أفهم سؤالك. هل يمكنك إعادة الصياغة؟') {
-                        for (const product of currentProducts) {
-                            const productNameLower = product.name.toLowerCase();
-                            const productDescriptionLower = product.description.toLowerCase();
-                            const productTypeLower = product.type ? product.type.toLowerCase() : '';
+                if (isUnanswered) { // Only try product matching if no intent was found
+                    for (const product of allProducts) {
+                        const productNameLower = product.name.toLowerCase();
+                        const productDescriptionLower = product.description.toLowerCase();
+                        const productTypeLower = product.type ? product.type.toLowerCase() : '';
 
-                            if (queryText.includes(productNameLower) ||
-                                queryText.includes(productDescriptionLower) ||
-                                queryText.includes(productTypeLower)) {
-                                response = `بالتأكيد! لدينا "${product.name}" (النوع: ${product.type || 'غير محدد'}). وصف المنتج: "${product.description}". السعر: ${product.price}. حالة التوفر: ${product.availability}.`;
-                                answeredSuccessfully = true;
-                                break;
-                            }
+                        if (lowerCaseQuery.includes(productNameLower) ||
+                            lowerCaseQuery.includes(productDescriptionLower) ||
+                            lowerCaseQuery.includes(productTypeLower)) {
+                            response = `بالتأكيد! لدينا "${product.name}" (النوع: ${product.type || 'غير محدد'}). وصف المنتج: "${product.description}". السعر: ${parseFloat(product.price).toFixed(0)} IQD. حالة التوفر: ${product.availability}.`;
+                            intentIdentified = 'معلومات_منتج'; // A generic intent for product info
+                            isUnanswered = false;
+                            break;
                         }
                     }
                 }
 
-                laylaResponseTextarea.value = response;
+                // Log the interaction to Firestore
+                // Corrected Firestore path to match dashboard's expectation
+                await addDoc(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${ADMIN_USER_ID}/chat_logs`), {
+                    userId: clientUserId, // Use the client's actual UID
+                    timestamp: Timestamp.now(),
+                    userQuery: queryText,
+                    laylaResponse: response,
+                    intentIdentified: intentIdentified,
+                    unanswered: isUnanswered, // Changed to 'unanswered' to match dashboard
+                    reviewed: false // New field to track if reviewed by admin
+                });
+                console.log("Layla interaction logged to Firestore from store.");
 
-                // Log this interaction to chat_logs collection
-                // Ensure this logging happens only if Firebase is fully initialized and authenticated
-                if (db && userId && auth.currentUser) {
-                    await addDoc(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/chat_logs`), {
-                        userId: auth.currentUser.uid, // Use the actual authenticated UID
-                        userQuery: testQueryInput.value.trim(), // Original query
-                        laylaResponse: response,
-                        unanswered: !answeredSuccessfully, // True if Layla didn't find a specific answer
-                        timestamp: Timestamp.now() // Use Timestamp.now() for consistency
-                    });
-                    console.log("Layla interaction logged to Firestore from dashboard test.");
-                } else {
-                    console.warn("Firebase not fully ready for logging chat interaction from dashboard test.");
-                }
+                return response;
 
             } catch (e) {
-                laylaResponseTextarea.value = `حدث خطأ أثناء محاولة ليلى الرد: ${e.message}`;
-                console.error("Error in Layla AI logic:", e);
-                // Log error interaction as unanswered
-                if (db && userId && auth.currentUser) {
-                    await addDoc(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${userId}/chat_logs`), {
-                        userId: auth.currentUser.uid,
-                        userQuery: testQueryInput.value.trim(),
-                        laylaResponse: `حدث خطأ أثناء محاولة ليلى الرد: ${e.message}`,
+                console.error("Error in Layla AI logic or Firestore logging from store:", e);
+                // Attempt to log the error interaction itself
+                try {
+                    // Corrected Firestore path for error logging as well
+                    await addDoc(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${ADMIN_USER_ID}/chat_logs`), {
+                        userId: clientUserId,
+                        timestamp: Timestamp.now(),
+                        userQuery: queryText,
+                        laylaResponse: `حدث خطأ: ${e.message}`,
+                        intentIdentified: 'خطأ_نظام',
                         unanswered: true, // Mark as unanswered due to error
-                        timestamp: Timestamp.now()
+                        reviewed: false
                     });
-                    console.log("Error interaction logged to Firestore from dashboard test.");
-                } else {
-                    console.warn("Firebase not fully ready for logging error chat interaction from dashboard test.");
+                } catch (logError) {
+                    console.error("Failed to log error interaction from store:", logError);
                 }
+                return `حدث خطأ أثناء محاولة ليلى الرد: ${e.message}`;
+            }
+        }
+
+        /**
+         * Adds a message to the chat window.
+         * @param {string} sender - The sender of the message (e.g., "أنت", "ليلى").
+         * @param {string} text - The message text.
+         * @param {string} type - CSS class for styling ('user-message' or 'layla-message').
+         */
+        function addChatMessage(sender, text, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', type);
+            messageDiv.textContent = `${sender}: ${text}`;
+            chatMessagesContainer.appendChild(messageDiv);
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+        }
+
+        // --- Notification Logic ---
+        function updateNotificationBadge() {
+            if (unreadNotificationsCount > 0) {
+                notificationBadge.textContent = unreadNotificationsCount;
+                notificationBadge.classList.remove('hidden');
+            } else {
+                notificationBadge.classList.add('hidden');
+            }
+        }
+
+        function showToastNotification(title, content) {
+            toastTitle.textContent = title;
+            toastContent.textContent = content;
+            toastNotification.classList.add('show');
+            setTimeout(() => {
+                toastNotification.classList.remove('show');
+            }, 5000); // Hide after 5 seconds
+        }
+
+        function showNotificationsModal() {
+            notificationsList.innerHTML = '';
+            if (allNotifications.length === 0) {
+                notificationsList.innerHTML = '<p class="no-notifications">لا توجد إشعارات حالياً.</p>';
+            } else {
+                allNotifications.forEach(notif => {
+                    const notifDiv = document.createElement('div');
+                    notifDiv.classList.add('notification-item');
+                    if (!notif.read) {
+                        notifDiv.classList.add('font-bold'); 
+                    }
+                    const date = notif.createdAt?.toDate ? notif.createdAt.toDate() : new Date(notif.createdAt);
+                    notifDiv.innerHTML = `
+                        <h4>${notif.title || 'إشعار جديد'}</h4>
+                        <p>${notif.content}</p>
+                        <p class="timestamp">${date.toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' })}</p>
+                    `;
+                    notifDiv.onclick = async () => {
+                        if (!notif.read) {
+                            // Mark as read in Firestore
+                            const notifRef = doc(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${ADMIN_USER_ID}/store_notifications`, notif.id);
+                            await updateDoc(notifRef, { read: true });
+                            // The onSnapshot listener will update the local allNotifications and badge
+                        }
+                    };
+                    notificationsList.appendChild(notifDiv);
+                });
+            }
+            showModal(notificationModal);
+        }
+
+        // --- Checkout Form Logic ---
+        const IraqiGovernorates = [
+            "نينوى", "بغداد", "البصرة", "الأنبار", "بابل", "صلاح الدين", "ديالى", "كربلاء",
+            "النجف", "واسط", "ذي قار", "المثنى", "القادسية", "ميسان", "كركوك", "أربيل",
+            "السليمانية", "دهوك", "الناصرية"
+        ].sort(); 
+
+        function populateGovernorates() {
+            governorateSelect.innerHTML = '<option value="">اختر محافظتك</option>';
+            IraqiGovernorates.forEach(gov => {
+                const option = document.createElement('option');
+                option.value = gov;
+                option.textContent = gov;
+                governorateSelect.appendChild(option);
+            });
+        }
+
+        function loadSavedAddress() {
+            const savedAddress = localStorage.getItem('savedAddress');
+            if (savedAddress) {
+                const address = JSON.parse(savedAddress);
+                governorateSelect.value = address.governorate || '';
+                areaInput.value = address.area || '';
+                landmarkInput.value = address.landmark || '';
+                phoneNumberInput.value = address.phoneNumber || '';
+                
+                // Prompt user to use saved address
+                // Replaced confirm() with a custom modal for better UX
+                showCustomConfirmModal("هل تريد استخدام العنوان المحفوظ؟", "اضغط موافق للاستخدام أو إلغاء لإدخال عنوان جديد.", 
+                    () => { // On Confirm
+                        updateCartDisplay(); 
+                    }, 
+                    () => { // On Cancel
+                        clearAddressForm();
+                    }
+                );
+            }
+        }
+
+        function clearAddressForm() {
+            governorateSelect.value = '';
+            areaInput.value = '';
+            landmarkInput.value = '';
+            phoneNumberInput.value = '';
+            additionalNotesInput.value = '';
+            saveAddressCheckbox.checked = false;
+            saveAddressTip.classList.add('hidden');
+            updateCartDisplay(); // Recalculate delivery cost to 0
+        }
+
+        function saveAddress() {
+            const address = {
+                governorate: governorateSelect.value,
+                area: areaInput.value,
+                landmark: landmarkInput.value,
+                phoneNumber: phoneNumberInput.value
+            };
+            localStorage.setItem('savedAddress', JSON.stringify(address));
+        }
+
+        // Custom Confirm Modal (replaces window.confirm)
+        function showCustomConfirmModal(title, message, onConfirm, onCancel) {
+            const modal = document.createElement('div');
+            modal.classList.add('app-modal', 'open');
+            modal.innerHTML = `
+                <div class="app-modal-content">
+                    <h3 class="text-xl font-bold text-center mb-4">${title}</h3>
+                    <p class="text-gray-700 text-center mb-6">${message}</p>
+                    <div class="flex justify-around gap-4">
+                        <button id="confirmBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex-1">موافق</button>
+                        <button id="cancelBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex-1">إلغاء</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            modal.querySelector('#confirmBtn').onclick = () => {
+                onConfirm();
+                modal.remove();
+            };
+            modal.querySelector('#cancelBtn').onclick = () => {
+                onCancel();
+                modal.remove();
+            };
+        }
+
+
+        // --- Event Listeners ---
+        // Bottom Navigation
+        navItems.forEach(item => {
+            item.onclick = () => {
+                const pageId = item.dataset.page;
+                let pageElement;
+                let pageTitle;
+
+                if (pageId === 'products-page') {
+                    pageElement = productsPage;
+                    pageTitle = 'متجر TERAKS'; 
+                    currentFilter = 'all'; 
+                    applyProductFilter();
+                } else if (pageId === 'chat-page') {
+                    pageElement = chatPage;
+                    pageTitle = 'تحدث مع ليلى';
+                } else if (pageId === 'cart-page') {
+                    pageElement = cartPage;
+                    pageTitle = 'السلة';
+                    updateCartDisplay(); 
+                }
+                navigateTo(pageElement, pageTitle);
+            };
+        });
+
+        // Product Search
+        productSearchInput.oninput = applyProductFilter;
+
+        // Product Type Filter
+        productTypeFilterStore.onchange = (e) => {
+            currentFilter = e.target.value === '' ? 'all' : e.target.value;
+            applyProductFilter();
+        };
+
+        // Show Offers Button
+        showOffersBtn.onclick = () => {
+            currentFilter = 'offers';
+            productTypeFilterStore.value = ''; 
+            productSearchInput.value = ''; 
+            applyProductFilter();
+        };
+
+        // Back button on Product Details Page
+        backToProductsBtn.onclick = () => {
+            navigateTo(productsPage, 'متجر TERAKS', true); 
+        };
+
+        // Chat Send Button
+        sendChatBtn.onclick = async () => {
+            const query = chatInput.value.trim();
+            if (query) {
+                addChatMessage("أنت", query, 'user-message');
+                chatInput.value = ''; 
+                const laylaResponse = await getLaylaResponse(query); // Call Layla's AI logic
+                addChatMessage("ليلى", laylaResponse, 'layla-message');
             }
         };
 
-        // Event listener for product type filter
-        productTypeFilter.onchange = filterAndDisplayProducts;
+        // Chat Input Enter Key
+        chatInput.onkeypress = (e) => {
+            if (e.key === 'Enter') {
+                sendChatBtn.click();
+            }
+        };
+
+        // Checkout Button
+        checkoutBtn.onclick = () => {
+            if (cartItems.length === 0) {
+                alertMessage('سلتك فارغة. لا يمكنك إتمام عملية الشراء.', 'info');
+                return;
+            }
+            populateGovernorates(); 
+            loadSavedAddress(); 
+            updateCartDisplay(); 
+            showModal(checkoutModal);
+        };
+
+        // Checkout Modal Close Button
+        closeCheckoutModalBtn.onclick = () => hideModal(checkoutModal);
+
+        // Checkout Form Submission
+        checkoutForm.onsubmit = async (e) => {
+            e.preventDefault(); 
+
+            const formData = new FormData(checkoutForm);
+            const orderDetails = {};
+            formData.forEach((value, key) => {
+                orderDetails[key] = value;
+            });
+
+            // Add cart items to order details
+            orderDetails['المنتجات المطلوبة'] = cartItems.map(item => 
+                `${item.name} (${item.type || 'غير محدد'}) - ${parseFloat(item.price).toFixed(0)} IQD x ${item.quantity}`
+            ).join('\n');
+            orderDetails['إجمالي المنتجات'] = productsSubtotalDisplay.textContent;
+            orderDetails['تكلفة التوصيل'] = deliveryCostDisplay.textContent;
+            orderDetails['الإجمالي الكلي'] = finalTotalDisplay.textContent;
+
+            // Prepare for Formspree
+            const formspreeData = new FormData();
+            for (const key in orderDetails) {
+                formspreeData.append(key, orderDetails[key]);
+            }
+
+            try {
+                const response = await fetch(checkoutForm.action, {
+                    method: checkoutForm.method,
+                    body: formspreeData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    alertMessage('!تم إرسال طلبك بنجاح', 'success');
+                    hideModal(checkoutModal);
+                    cartItems = []; 
+                    updateCartDisplay();
+                    if (saveAddressCheckbox.checked) {
+                        saveAddress();
+                    } else {
+                        localStorage.removeItem('savedAddress'); 
+                    }
+                } else {
+                    const data = await response.json();
+                    alertMessage(`خطأ في إرسال الطلب: ${data.errors ? data.errors.map(err => err.message).join(', ') : 'خطأ غير معروف'}`, 'error');
+                }
+            } catch (error) {
+                alertMessage('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.', 'error');
+                console.error('Form submission error:', error);
+            }
+        };
+
+        // Governorate selection changes delivery cost
+        governorateSelect.onchange = updateCartDisplay;
+
+        // Save Address checkbox tip
+        saveAddressCheckbox.onchange = () => {
+            if (saveAddressCheckbox.checked) {
+                saveAddressTip.classList.remove('hidden');
+            } else {
+                saveAddressTip.classList.add('hidden');
+            }
+        };
+
+        // Notification Icon
+        notificationIcon.onclick = showNotificationsModal;
+        closeNotificationModalBtn.onclick = () => hideModal(notificationModal);
+
+        // Email Icon
+        emailIcon.onclick = () => {
+            window.location.href = 'mailto:f300f30m@gmail.com?subject=استفسار من متجر TERAKS&body=مرحباً، أود الاستفسار عن...';
+        };
+
+        // Privacy Policy Icon
+        privacyPolicyIcon.onclick = () => showModal(privacyPolicyModal);
+        closePrivacyPolicyModalBtn.onclick = () => hideModal(privacyPolicyModal);
+
 
         // Initialize Firebase when the window loads
-        window.onload = initializeFirebase;
+        window.onload = () => {
+            initializeFirebase();
+            // Set initial page to products
+            navigateTo(productsPage, 'متجر TERAKS'); 
+            
+            // Remove sample products now that the app is fully functional
+            // allProducts will be populated directly from Firestore
+        };
     </script>
 </body>
 </html>
