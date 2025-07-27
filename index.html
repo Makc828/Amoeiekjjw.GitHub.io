@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>TERAKS STORE</title>
+    <title>TERAKS STORE - متجر عصري</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome for icons -->
@@ -11,16 +11,15 @@
     <!-- Google Fonts: Cairo for headings, Noto Sans Arabic for body text -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Noto+Sans+Arabic:wght@400;500&display=swap" rel="stylesheet">
     <style>
         /* General App Styling */
         body {
             font-family: 'Noto Sans Arabic', sans-serif; /* Default body font */
-            background-color: #f0f2f5; /* Light gray background for app feel */
+            background-color: #f3f4f6; /* Light gray background - Unified with Dashboard */
             margin: 0;
             padding: 0;
             overflow: hidden; /* Prevent body scroll, pages will scroll */
-            /* Prevent text selection and zoom for native app feel */
             user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -30,11 +29,18 @@
         }
 
         /* Apply Cairo to headings and prominent text */
-        h1, h2, h3, .product-card h3, .price, .total-line span, #checkout-btn, .add-to-cart-btn, 
+        h1, h2, h3, .product-card h3, .total-line span, #checkout-btn, .add-to-cart-btn, 
         .product-card .add-to-cart-btn-card, .product-card .view-details-btn, .nav-item span,
-        .app-modal-content h3, .app-modal-content button {
+        .app-modal-content h3, .app-modal-content button, .toast-title {
             font-family: 'Cairo', sans-serif;
         }
+        /* Specific styling for price to match screenshot */
+        .price {
+            font-family: 'Cairo', sans-serif; /* Ensure Cairo for prices */
+            font-weight: 900; /* Extra bold for numbers */
+            color: #2d3748; /* Darker color as per screenshot */
+        }
+
 
         /* IMPORTANT: Ensure Font Awesome icons use their correct font */
         .fas {
@@ -49,33 +55,41 @@
             max-width: 500px; /* Max width for mobile-like feel */
             margin: 0 auto; /* Center the app container */
             background-color: white; /* App background */
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            border-radius: 15px; /* Rounded corners for app container */
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.15); /* More prominent shadow */
+            border-radius: 20px; /* More rounded corners for app container */
             overflow: hidden; /* Hide overflow from pages */
         }
 
         /* Header Styling */
         header {
-            background-color: #6b46c1; /* Purple */
+            background-color: #2563eb; /* Blue-600 - Unified with Dashboard primary blue */
             color: white;
-            padding: 1rem;
+            padding: 1rem 1.25rem; /* Increased padding */
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             z-index: 10; /* Above content */
             display: flex; /* Use flex for header content */
             justify-content: space-between;
             align-items: center;
+            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out; /* For hiding/showing */
+        }
+        header.hidden-header { /* New class to hide header */
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none; /* Disable interactions when hidden */
         }
         header h1 {
-            font-size: 1.8rem; /* Larger title */
-            font-weight: bold;
+            font-size: 2rem; /* Larger title */
+            font-weight: 700; /* Bolder */
             flex-grow: 1; /* Allow title to take space */
             text-align: center; /* Center the title */
+            letter-spacing: 0.05em; /* Slight letter spacing */
         }
         .header-icons {
             display: flex;
-            gap: 1rem;
-            font-size: 1.2rem;
+            gap: 1.25rem; /* Increased gap */
+            font-size: 1.3rem; /* Larger icons */
+            transition: opacity 0.3s ease-in-out; /* Smooth hide/show */
         }
         .header-icon-btn {
             background: none;
@@ -85,45 +99,53 @@
             cursor: pointer;
             padding: 0; /* Remove default button padding */
             line-height: 1; /* Ensure icon is centered */
+            transition: transform 0.2s ease-in-out;
+        }
+        .header-icon-btn:hover {
+            transform: scale(1.1);
         }
         .notification-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: #ef4444; /* Red */
+            top: -8px; /* Adjusted position */
+            right: -8px; /* Adjusted position */
+            background-color: #ef4444; /* Red - Consistent */
             color: white;
             border-radius: 50%;
-            padding: 0.1rem 0.4rem;
-            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem; /* Larger badge */
+            font-size: 0.75rem; /* Larger font */
             font-weight: bold;
             line-height: 1;
+            min-width: 20px; /* Ensure circular shape */
+            text-align: center;
         }
 
         /* Page Content Styling */
         .page-content {
-            flex-grow: 1;
+            flex-grow: 1; /* This is key for filling remaining space */
             overflow-y: auto; /* Enable scrolling for page content */
-            background-color: #f0f2f5; /* Page background */
+            background-color: #f3f4f6; /* Light gray background - Unified */
             display: none; /* Hidden by default */
-            position: absolute; /* Position for transitions */
-            top: 0; 
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            position: relative; /* Changed from absolute to relative */
+            height: 100%; /* Ensure it takes full height of its flex container */
+            transition: transform 0.3s ease, opacity 0.3s ease; /* Reduced transition duration */
             transform: translateX(100%);
             opacity: 0;
             z-index: 5;
             flex-direction: column;
-            /* No padding-bottom here, sticky elements will handle space */
         }
         .page-content.active {
             display: flex; 
             transform: translateX(0);
             opacity: 1;
-            position: relative;
             z-index: 6;
         }
+        /* New rule to hide inactive pages without transition issues */
+        .page-content:not(.active) {
+            display: none !important;
+            transform: translateX(100%) !important; /* Ensure off-screen */
+            opacity: 0 !important;
+        }
+
         .page-content.slide-out {
             transform: translateX(-100%);
             opacity: 0;
@@ -136,13 +158,16 @@
         }
         /* Specific page adjustments */
         #products-page {
-            padding-top: 1rem; /* Added padding for content */
+            padding-top: 1.5rem; /* Added padding for content */
         }
         #product-details-page {
             padding-top: 0; /* Header is part of content flow */
         }
         #chat-page, #cart-page {
-            padding-top: 1rem; /* Add general top padding for content */
+            padding-top: 1.5rem; /* Add general top padding for content */
+            height: 100%; /* Ensure it takes full height */
+            display: flex; /* Ensure flex for internal layout */
+            flex-direction: column; /* Ensure column direction */
         }
 
 
@@ -153,8 +178,8 @@
             align-items: center;
             background-color: white;
             border-top: 1px solid #e0e0e0;
-            padding: 0.5rem 0;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+            padding: 0.4rem 0; /* Reduced padding */
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); /* Softer shadow */
             z-index: 20;
             position: relative;
         }
@@ -162,452 +187,845 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            color: #a0a0a0;
-            font-size: 0.75rem;
+            color: #a0aec0; /* Gray-400 - Consistent */
+            font-size: 0.7rem; /* Smaller font */
             cursor: pointer;
-            padding: 0.5rem;
-            transition: color 0.2s ease-in-out;
+            padding: 0.4rem; /* Reduced padding */
+            transition: color 0.3s ease-in-out, transform 0.2s ease-in-out;
             flex: 1;
+            position: relative;
         }
         .nav-item.active {
-            color: #6b46c1;
+            color: #2563eb; /* Blue-600 - Unified */
+            transform: translateY(-2px); /* Smaller lift */
         }
         .nav-item i {
-            font-size: 1.2rem;
-            margin-bottom: 0.2rem;
+            font-size: 1.1rem; /* Smaller icons */
+            margin-bottom: 0.2rem; /* Smaller margin */
         }
         #chat-nav-item {
-            background-color: #6b46c1;
+            background-color: #2563eb; /* Blue-600 - Unified */
             color: white;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
+            width: 55px; /* Smaller button */
+            height: 55px; /* Smaller button */
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.8rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            transform: translateY(-20%);
-            transition: background-color 0.2s ease-in-out;
+            font-size: 1.6rem; /* Smaller icon */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Softer shadow */
+            transform: translateY(-25%); /* Adjusted lift */
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+            border: 3px solid white; /* Thinner white border */
         }
         #chat-nav-item:hover {
-            background-color: #5a32a3;
+            background-color: #1d4ed8; /* Blue-700 - Unified */
+            transform: translateY(-28%) scale(1.03); /* Smaller hover effect */
         }
 
         /* Product Card Styling */
         .product-card {
             background-color: white;
-            border-radius: 10px; /* 10px radius */
+            border-radius: 15px; /* More rounded corners */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Softer, larger shadow */
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            width: calc(50% - 0.75rem); /* Adjusted width for better spacing */
+            margin-bottom: 1.5rem; /* More margin */
+            flex-shrink: 0;
+            cursor: pointer; /* Indicate clickable */
+            position: relative; /* For availability badge positioning */
+            opacity: 0; /* Initial state for animation */
+            transform: translateY(20px); /* Initial state for animation */
+            animation: fadeInSlideUp 0.5s ease-out forwards; /* Apply animation */
+        }
+        .product-card:hover {
+            transform: translateY(-5px); /* More pronounced lift */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+        }
+        /* Keyframes for product card entry animation */
+        @keyframes fadeInSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 160px; /* Slightly increased height */
+            object-fit: cover;
+            border-bottom: 1px solid #f0f0f0; /* Lighter border */
+            border-top-left-radius: 15px; /* Top corners rounded */
+            border-top-right-radius: 15px;
+        }
+        .product-card-info {
+            padding: 1rem; /* Increased padding */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+        .product-card h3 {
+            font-size: 1rem; /* Smaller font for titles */
+            font-weight: 700; /* Bolder */
+            color: #2d3748; /* Darker text */
+            margin-bottom: 0.4rem; /* Adjusted margin */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            height: 2.8rem; /* Fixed height for two lines */
+        }
+        .product-card .price-and-cart {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-top: 0.75rem; /* Space from name */
+        }
+        .product-card .price {
+            font-size: 1.05rem; /* Smaller price */
+            margin-bottom: 0; /* No bottom margin here */
+        }
+        .product-card .availability-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 0.3rem 0.7rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            z-index: 5; /* Above image */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .product-card .availability-badge.available {
+            background-color: #d1fae5; /* Green-100 */
+            color: #065f46; /* Dark green */
+        }
+        .product-card .availability-badge.unavailable {
+            background-color: #fee2e2; /* Red-100 */
+            color: #991b1b; /* Dark red */
+        }
+        .product-card .availability-badge.soon {
+            background-color: #dbeafe; /* Blue-100 */
+            color: #1e40af; /* Dark blue */
+        }
+        /* Rating stars on product card - NEW POSITIONING */
+        .product-card .rating-display {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center align stars */
+            gap: 0.2rem; /* Space between stars and count */
+            font-size: 0.75rem; /* Small font size for count */
+            color: #4a5568; /* Gray text */
+            margin-bottom: 0.4rem; /* Space between rating and title */
+            /* Removed absolute positioning styles */
+        }
+        .product-card .rating-display .star-icon {
+            color: #f59e0b; /* Amber for stars */
+            font-size: 0.8rem; /* Smaller star size */
+        }
+        .product-card .rating-display .no-rating {
+            color: #a0aec0; /* Lighter gray for no rating */
+        }
+        /* Add to cart icon color */
+        .product-card .add-to-cart-btn-card {
+            color: #2563eb; /* Blue-600 */
+            font-size: 1.2rem; /* Ensure icon size is good */
+            transition: transform 0.2s ease-in-out;
+        }
+        .product-card .add-to-cart-btn-card:hover {
+            transform: scale(1.1);
+        }
+
+
+        #products-display {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 1.5rem; /* Increased gap for better spacing */
+            padding: 0 1.25rem 1.5rem; /* More padding */
+            width: 100%;
+        }
+        #products-page {
+            overflow-x: hidden;
+        }
+        /* New styles for search input and filter/offers alignment */
+        /* Changed to flex-row for search and type filter */
+        .search-and-type-filter-row { /* New container for search and type filter */
+            display: flex;
+            flex-direction: row; /* Horizontal layout */
+            align-items: center;
+            gap: 0.8rem; /* Space between search and type filter */
+            margin-bottom: 0.8rem; /* Space below this row */
+            padding: 0 1.25rem; /* Horizontal padding for the row */
+        }
+        .search-input-wrapper {
+            position: relative;
+            flex-grow: 1; /* Allow search input to take available space */
+        }
+        .search-input-wrapper .search-icon {
+            position: absolute;
+            left: 12px; /* Adjust for RTL */
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280; /* Gray-500 */
+            font-size: 1rem;
+        }
+        #productSearchInput {
+            padding-left: 40px; /* Make space for the icon */
+        }
+        .type-filter-container { /* Container for type filter */
+            flex-shrink: 0; /* Prevent shrinking */
+            display: flex; /* Ensure inner elements align */
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .type-filter-container label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #4a5568;
+            white-space: nowrap;
+        }
+        #productTypeFilterStore {
+            height: 38px; /* Consistent height with search input */
+            padding: 0.2rem 0.5rem;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            border-radius: 8px; /* More rounded */
+            max-width: 100%;
+            flex-grow: 1;
+        }
+
+        .filter-buttons-container {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            justify-content: flex-start; /* Align items to the start */
+            gap: 0.5rem; /* Gap between buttons */
+            padding: 0 1.25rem; /* Add horizontal padding to container */
+            width: 100%;
+            margin-bottom: 1.5rem; /* More space below buttons */
+        }
+        #showOffersBtn, #showBestSellingBtn, #showMostRatedBtn { /* Added Most Rated button */
+            height: 32px; /* Consistent height for all buttons */
+            padding: 0.3rem 0.6rem; /* Consistent padding */
+            font-size: 0.75rem; /* Consistent font size */
+            white-space: nowrap; /* Prevent text wrapping */
+            border-radius: 6px; /* Consistent border radius */
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+        #showMostRatedBtn {
+            background-color: #f59e0b; /* Amber color for rating */
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+        }
+        #showMostRatedBtn:hover {
+            background-color: #d97706; /* Darker amber on hover */
+            transform: scale(1.03);
+        }
+
+
+        /* Product Details Page Styling */
+        #product-details-page {
+            /* No padding-top here, as its own header will provide it */
+            background-color: #f3f4f6; /* Light gray background - Unified */
+            flex-direction: column; /* Ensure column layout */
+            height: 100%; /* Take full height */
+        }
+        /* The new header for product details page */
+        #product-details-page .details-header {
+            background-color: #2563eb; /* Blue-600 - Unified with main header */
+            color: white;
+            padding: 0.6rem 1rem; /* Reduced padding */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Slightly smaller shadow */
+            display: flex;
+            align-items: center;
+            width: 100%;
+            z-index: 10;
+            flex-direction: row;
+            justify-content: space-between;
+            /* Ensure it fills the space previously occupied by the main header */
+            height: 64px; /* Approximate height of the main header */
+        }
+        #product-details-page .details-header button {
+            background: none;
+            border: none;
+            font-size: 1.4rem; /* Smaller icon size */
+            color: white;
+            padding: 0 8px; /* Reduced padding */
+            transition: transform 0.2s ease-in-out;
+        }
+        #product-details-page .details-header button:hover {
+            transform: translateX(3px); /* Smaller arrow movement */
+        }
+        #product-details-page .details-header h2 {
+            flex-grow: 1;
+            text-align: right;
+            font-size: 1.1rem; /* Smaller title font size */
+            font-weight: 700;
+            color: white;
+            margin-right: 30px; /* Adjusted margin for back button on left */
+            margin-left: 0;
+        }
+
+        /* Main scrollable content for product details */
+        .product-details-scroll-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #f3f4f6;
+            padding-bottom: 80px; /* Space for fixed add to cart button */
+        }
+
+        .product-image-section {
+            padding: 1rem; /* p-4 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff; /* bg-white for image section */
+            border-bottom-left-radius: 1rem;
+            border-bottom-right-radius: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 0; /* Removed margin-bottom here */
+        }
+
+        .product-image-section img {
+            width: 100%; /* Make image fluid */
+            max-width: 320px; /* Max width from original */
+            height: 320px; /* Fixed height from original */
+            object-fit: contain; /* Use contain to fit image fully */
+            border-radius: 0.5rem;
+        }
+
+        /* Removed .product-details-content-main card styling */
+        .product-details-content-main {
+            padding: 1.5rem; /* Padding for the content below image */
+            background-color: #f3f4f6; /* Match page background */
+            margin: 0; /* Remove margin from sides */
+            border-radius: 0; /* Remove border radius */
+            box-shadow: none; /* Remove box shadow */
+            display: flex;
+            flex-direction: column;
+            gap: 1rem; /* Default gap between sections */
+        }
+
+        /* New: Horizontal divider line */
+        .horizontal-divider {
+            width: calc(100% - 3rem); /* Full width minus padding */
+            height: 2px; /* Thickness of the line */
+            background-color: #ccc; /* Grey color for the line */
+            margin: 1.5rem auto; /* Center the line with vertical margin */
+            border-radius: 1px; /* Slightly rounded ends */
+        }
+        
+        .product-type-text {
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.875rem;
+            color: #6366f1;
+            font-weight: 600;
+            padding-top: 0; /* Remove padding to the top of the content block */
+        }
+
+        .product-title {
+            display: block;
+            font-size: 1.875rem;
+            line-height: 2.25rem;
+            font-weight: 800;
+            color: #1a202c;
+            transition: color 0.2s ease-in-out;
+        }
+
+        .product-title:hover {
+            text-decoration: underline;
+        }
+
+        .product-description {
+            color: #4a5568;
+            line-height: 1.625;
+        }
+
+        .price-availability-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 0.5rem;
+        }
+
+        .product-price-main {
+            font-size: 1.8rem; /* Slightly smaller price */
+            font-weight: 700;
+            color: #1a202c;
+        }
+        .currency-unit {
+            font-size: 0.9rem; /* Smaller font for currency unit */
+            color: #4a5568;
+            margin-right: 0.25rem;
+        }
+
+        .tax-info {
+            display: none; /* Hidden as requested */
+        }
+
+        .availability-status {
+            display: flex;
+            align-items: center;
+        }
+
+        .availability-text {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+        }
+
+        .availability-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #34d399;
+        }
+
+        .color-options-section {
+            padding-bottom: 0; /* Removed padding to the bottom of the content block */
+        }
+
+        .color-options-section h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .color-swatch-container {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        /* Style for color buttons */
+        .color-button {
+            background-color: #e2e8f0; /* Light gray background */
+            color: #2d3748; /* Dark text */
+            padding: 0.5rem 1rem;
+            border-radius: 8px; /* Rounded corners */
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease-in-out;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .color-button.selected {
+            background-color: #3b82f6; /* Blue-500 for selected */
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* Outer glow */
+        }
+        .color-button.unavailable-color {
+            opacity: 0.6;
+            cursor: not-allowed;
+            text-decoration: line-through; /* Strikethrough for unavailable */
+            background-color: #f0f0f0;
+            color: #a0aec0;
+        }
+        .color-button:hover:not(.unavailable-color) {
+            background-color: #cbd5e1; /* Darker gray on hover */
+        }
+
+
+        /* Fixed Add to Cart Button Bar */
+        .fixed-add-to-cart-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 500px; /* Match app container max-width */
+            margin: 0 auto; /* Center the bar */
+            background-color: white;
+            padding: 1rem; /* py-4 px-6 */
+            box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+            z-index: 100;
+            display: flex;
+            justify-content: center; /* Center the button */
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+
+        .add-to-cart-button {
+            width: 90%; /* Make button take most of the width */
+            background-color: #4f46e5; /* bg-indigo-600 */
+            color: white; /* text-white */
+            font-weight: 700; /* font-bold */
+            padding: 0.75rem 1.5rem; /* py-3 px-6 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        .add-to-cart-button:hover:not([disabled]) {
+            background-color: #4338ca; /* hover:bg-indigo-700 */
+            transform: scale(1.02); /* Slightly less pronounced hover effect */
+        }
+
+        .add-to-cart-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+        }
+
+        .add-to-cart-button[disabled] {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #a0aec0; /* Greyed out */
+        }
+
+        /* Suggested Products Section */
+        .suggested-products-section {
+            background-color: #f3f4f6; /* Match page background */
+            padding: 1.5rem;
+            margin-top: 0; /* No top margin, separated by divider */
+        }
+        .suggested-products-section h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .suggested-products-carousel {
+            display: flex;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            gap: 1rem; /* Space between cards */
+            padding-bottom: 1rem; /* Space for scrollbar */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            scrollbar-width: none; /* Hide scrollbar for Firefox */
+            -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
+        }
+        .suggested-products-carousel::-webkit-scrollbar {
+            display: none; /* Hide scrollbar for Chrome, Safari, Opera */
+        }
+        .suggested-product-card {
+            background-color: white;
+            border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
-            transition: transform 0.2s ease-in-out;
-            width: calc(50% - 0.5rem); /* Fixed width - تم تعديل العرض ليكون نصف الشاشة مع مسافة بين البطاقات */
-            /* Removed fixed height: height: 240px; */
-            margin-bottom: 1rem;
-            flex-shrink: 0; /* Prevent shrinking in grid */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            min-width: 140px; /* Fixed width for horizontal scroll */
+            max-width: 140px; /* Fixed width for horizontal scroll */
+            flex-shrink: 0; /* Prevent shrinking */
+            cursor: pointer;
         }
-        .product-card:hover {
+        .suggested-product-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
         }
-        .product-card img {
-            width: 100%; /* 160px */
-            height: 140px; /* Adjusted height to allow more space for content */
+        .suggested-product-card img {
+            width: 100%;
+            height: 100px; /* Smaller image height */
             object-fit: cover;
-            border-bottom: 1px solid #eee;
-            border-top-left-radius: 10px; /* Top corners rounded */
-            border-top-right-radius: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
         }
-        .product-card-info {
-            padding: 0.75rem; /* Increased padding */
+        .suggested-product-card-info {
+            padding: 0.75rem;
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            justify-content: space-between; /* Push buttons to bottom */
         }
-        .product-card h3 {
-            font-size: 1.1rem;
+        .suggested-product-card h4 {
+            font-size: 0.85rem; /* Smaller font for titles */
             font-weight: 600;
-            color: #333;
-            margin-bottom: 0.25rem; /* Reduced margin */
-            overflow: hidden; /* Hide overflow */
-            text-overflow: ellipsis; /* Add ellipsis */
+            color: #2d3748;
+            margin-bottom: 0.2rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
             display: -webkit-box;
-            -webkit-line-clamp: 2; /* Limit to 2 lines */
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
-            height: 2.8rem; /* Fixed height for two lines */
+            height: 2.4rem; /* Fixed height for two lines */
         }
-        .product-card .price {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #6b46c1;
-            margin-bottom: 0.5rem;
-        }
-        .product-card .availability {
-            padding: 0.3rem 0.6rem; /* Slightly larger padding */
-            border-radius: 9999px;
-            font-size: 0.75rem; /* Slightly larger font */
-            font-weight: 500;
-            display: inline-block;
-            margin-bottom: 0.5rem;
-        }
-        .product-card .buttons-container {
-            display: flex;
-            gap: 0.25rem; /* Smaller gap */
-            margin-top: auto; /* Push to bottom */
-            width: 100%;
-            justify-content: center; /* Center buttons */
-        }
-        .product-card .buttons-container button {
-            padding: 0.5rem 0.6rem; /* Slightly larger padding */
-            border-radius: 6px; /* Slightly smaller radius */
-            font-weight: 500;
-            transition: background-color 0.2s ease-in-out;
-            font-size: 0.8rem; /* Slightly larger font size */
-            flex: 1; /* Allow buttons to grow */
-            max-width: 50%; /* Max width for two buttons */
-        }
-        .product-card .view-details-btn {
-            background-color: transparent; /* No background */
-            color: #3b82f6; /* Blue text */
-            border: 1px solid #3b82f6; /* Blue border */
-        }
-        .product-card .view-details-btn:hover {
-            background-color: #e0f2fe; /* Light blue hover */
-        }
-        .product-card .add-to-cart-btn-card {
-            background-color: #6b46c1; /* Purple */
-            color: white;
-            border: 1px solid #6b46c1; /* Purple border */
-            width: 30px; /* Fixed width for icon button */
-            height: 30px; /* Fixed height for icon button */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.9rem; /* Icon size */
-            border-radius: 50%; /* Circular */
-            flex: none; /* Don't grow */
-        }
-        .product-card .add-to-cart-btn-card:hover {
-            background-color: #5a32a3;
-        }
-        /* Adjust display for fixed card size - تم تغيير النظام من Grid إلى Flexbox */
-        #products-display {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            gap: 1rem; /* Increased gap for better spacing */
-            padding: 0 0.5rem 1rem;
-            width: 100%;
-        }
-        /* Ensure no horizontal scroll for products-display */
-        #products-page {
-            overflow-x: hidden;
+        .suggested-product-card p {
+            font-size: 0.8rem; /* Smaller price font */
+            font-weight: 700;
+            color: #2563eb;
         }
 
-        /* Product Details Page Styling */
-        #product-details-page .details-header {
-            background-color: white;
-            padding: 1rem;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            display: flex;
-            align-items: center;
-            width: 100%;
-            z-index: 10;
-        }
-        #product-details-page .details-header button {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #6b46c1;
-            padding: 0 10px;
-        }
-        #product-details-page .details-header h2 {
-            flex-grow: 1;
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #333;
-            margin-right: 40px; /* Offset for back button */
-        }
-        #product-details-page .details-content-wrapper {
-            flex-grow: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            background-color: #f0f2f5;
-            padding: 1rem;
-        }
-        /* Adjusted image size for product details */
-        #product-details-page img {
-            width: 200px; /* Increased width */
-            height: 300px; /* Increased height */
-            object-fit: cover;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            margin-bottom: 1.5rem;
-        }
-        #product-details-page h3 {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-        #product-details-page .type {
-            color: #666;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-        #product-details-page .description {
-            color: #555;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 1.5rem;
-            max-width: 80%;
-        }
-        #product-details-page .price {
-            font-size: 1.6rem;
-            font-weight: bold;
-            color: #6b46c1;
-            margin-bottom: 1rem;
-        }
-        #product-details-page .availability {
-            padding: 0.5rem 1rem;
-            border-radius: 9999px;
-            font-size: 1rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 1.5rem;
-        }
-        #product-details-page .add-to-cart-btn {
-            background-color: #6b46c1;
-            color: white;
-            padding: 0.8rem 2rem;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            transition: background-color 0.2s ease-in-out;
-        }
-        #product-details-page .add-to-cart-btn:hover {
-            background-color: #5a32a3;
-        }
 
         /* Chat Page Styling */
         #chat-page {
             display: flex;
             flex-direction: column;
-            height: 100%; /* Ensure chat page takes full height */
+            height: 100%;
         }
         #chat-page .chat-messages-container {
-            flex-grow: 1;
+            flex: 1; /* Use flex instead of flex-grow */
             overflow-y: auto;
-            background-color: #f3f4f6;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            /* Removed padding-bottom */
+            background-color: #f9fafb; /* Gray-50 - Unified with dashboard sections */
+            padding: 1.5rem; /* More padding */
         }
         #chat-page .message {
-            margin-bottom: 0.75rem;
-            padding: 0.6rem 1rem;
-            border-radius: 12px;
-            max-width: 80%;
-            line-height: 1.4;
+            margin-bottom: 1rem; /* More margin */
+            padding: 0.8rem 1.2rem; /* Larger padding */
+            border-radius: 18px; /* More rounded */
+            max-width: 85%;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            opacity: 0; /* Initial state for animation */
+            transform: translateY(10px); /* Initial state for animation */
+            animation: fadeInSlideUpMessage 0.3s ease-out forwards; /* Apply animation */
+        }
+        /* Keyframes for chat message entry animation */
+        @keyframes fadeInSlideUpMessage {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         #chat-page .user-message {
-            background-color: #dbeafe;
+            background-color: #bfdbfe; /* Blue-200 - Unified with a lighter blue */
             align-self: flex-end;
             margin-right: auto;
             text-align: right;
+            border-bottom-right-radius: 5px; /* Pointy corner */
         }
         #chat-page .layla-message {
-            background-color: #e9d5ff;
+            background-color: #e2e8f0; /* Gray-200 - Unified with dashboard layla message */
             align-self: flex-start;
             margin-left: auto;
             text-align: left;
+            border-bottom-left-radius: 5px; /* Pointy corner */
         }
         #chat-page .chat-input-area {
             background-color: white;
-            padding: 0.75rem 1rem;
-            border-top: 1px solid #eee;
+            padding: 1rem 1.25rem; /* More padding */
+            border-top: 1px solid #e2e8f0; /* Lighter border - Consistent */
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            position: sticky; /* Make it stick to the bottom */
-            bottom: 0; /* Stick to the bottom of its flex container */
+            gap: 0.75rem; /* Larger gap */
+            position: sticky;
+            bottom: 0;
             z-index: 7;
-            flex-shrink: 0; /* Prevent it from shrinking */
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); /* Add shadow for separation */
+            flex-shrink: 0;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
         }
         #chat-page .chat-input-area input {
             flex-grow: 1;
-            padding: 0.75rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: 25px;
+            padding: 0.8rem 1.2rem; /* Larger padding */
+            border: 1px solid #d1d5db; /* Gray-300 - Unified */
+            border-radius: 30px; /* More rounded */
             font-size: 1rem;
+            background-color: #f7fafc; /* Very light background */
         }
         #chat-page .chat-input-area button {
-            background-color: #6b46c1;
+            background-color: #2563eb; /* Blue-600 - Unified */
             color: white;
-            width: 40px;
-            height: 40px;
+            width: 48px; /* Larger button */
+            height: 48px; /* Larger button */
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.2rem;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.2s ease-in-out;
+            font-size: 1.4rem; /* Larger icon */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
         }
         #chat-page .chat-input-area button:hover {
-            background-color: #5a32a3;
+            background-color: #1d4ed8; /* Blue-700 - Unified */
+            transform: scale(1.05);
         }
 
         /* Cart Page Styling */
         #cart-page {
             display: flex;
             flex-direction: column;
-            height: 100%; /* Ensure cart page takes full height */
+            height: 100%;
         }
         #cart-page .cart-items-container {
             flex-grow: 1;
             overflow-y: auto;
-            background-color: #f0f2f5;
-            padding: 1rem;
-            /* Removed padding-bottom */
+            background-color: #f3f4f6; /* Light gray background - Unified */
+            padding: 1.5rem; /* More padding */
         }
         .cart-item {
             background-color: white;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
+            border-radius: 15px; /* More rounded */
+            padding: 1rem; /* Adjusted padding */
+            margin-bottom: 1.25rem; /* More margin */
             display: flex;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease-in-out;
+            position: relative; /* For title positioning */
+            flex-wrap: wrap; /* Allow wrapping for better layout on small screens */
+        }
+        .cart-item:hover {
+            transform: translateY(-3px);
+        }
+        .cart-item-title { /* New style for product title in cart */
+            position: absolute;
+            top: 0.5rem; /* Adjust as needed */
+            right: 1rem; /* Adjust as needed */
+            font-weight: 700;
+            color: #2d3748;
+            font-size: 0.9rem; /* Smaller font for title */
+            width: calc(100% - 2rem); /* Take full width minus padding */
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .cart-item img {
-            width: 60px;
-            height: 60px;
+            width: 60px; /* Smaller image */
+            height: 60px; /* Smaller image */
             object-fit: cover;
-            border-radius: 8px;
-            margin-left: 1rem;
+            border-radius: 8px; /* More rounded */
+            margin-left: 1rem; /* Adjusted margin */
             flex-shrink: 0;
+            margin-top: 1.5rem; /* Space for the title above */
         }
-        .cart-item-info {
-            flex-grow: 1;
-        }
-        .cart-item-info h4 {
-            font-weight: 600;
-            color: #333;
-            font-size: 1rem;
-        }
-        .cart-item-info p {
-            color: #666;
-            font-size: 0.85rem;
+        .cart-item-controls-wrapper { /* New wrapper for controls and remove button */
+            display: flex;
+            align-items: center;
+            flex-grow: 1; /* Allow it to take available space */
+            justify-content: space-between; /* Distribute items */
+            margin-top: 1.5rem; /* Space for the title above */
         }
         .cart-item .quantity-controls {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-right: 1rem;
+            gap: 0.5rem; /* Smaller gap */
+            margin-right: 0; /* Remove right margin */
         }
         .cart-item .quantity-controls button {
-            background-color: #eee;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 25px;
-            height: 25px;
+            background-color: #e5e7eb; /* Gray-200 - Unified */
+            border: 1px solid #d1d5db; /* Gray-300 - Unified */
+            border-radius: 6px; /* More rounded */
+            width: 28px; /* Smaller button */
+            height: 28px; /* Smaller button */
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1rem;
+            font-size: 1rem; /* Smaller font */
             cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .cart-item .quantity-controls button:hover {
+            background-color: #d1d5db; /* Gray-300 - Unified */
         }
         .cart-item .quantity-controls span {
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 0.95rem; /* Smaller font */
+            color: #2d3748;
         }
         .cart-item .remove-btn {
             background: none;
             border: none;
-            color: #ef4444;
-            font-size: 1.2rem;
+            color: #ef4444; /* Red - Consistent */
+            font-size: 1.2rem; /* Smaller icon */
             cursor: pointer;
             flex-shrink: 0;
+            transition: transform 0.2s ease-in-out;
+            margin-right: 0.75rem; /* Add margin to separate from quantity controls */
         }
+        .cart-item .remove-btn:hover {
+            transform: scale(1.1);
+        }
+        .cart-item-price-quantity { /* New class for price x quantity text */
+            font-size: 0.85rem; /* Smaller font */
+            color: #6a737d; /* Darker gray */
+            text-align: right;
+            width: 100%; /* Take full width */
+            margin-top: 0.5rem; /* Space from controls */
+        }
+
         #cart-total-container {
             background-color: white;
-            padding: 1rem;
-            border-top: 1px solid #eee;
+            padding: 0.8rem 1.5rem; /* Reduced vertical padding */
+            border-top: 1px solid #e2e8f0; /* Consistent */
             text-align: center;
-            position: sticky; /* Make it stick to the bottom */
-            bottom: 0; /* Stick to the bottom of its flex container */
+            position: sticky;
+            bottom: 0;
             z-index: 7;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
-            flex-shrink: 0; /* Prevent it from shrinking */
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            gap: 0.4rem; /* Reduced gap */
+            flex-shrink: 0;
+            box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.1);
         }
         #cart-total-container .total-line {
             display: flex;
             justify-content: space-between;
-            font-size: 1rem; /* Adjusted font size for "الإجمالية" */
-            font-weight: bold;
+            font-size: 0.9rem; /* Adjusted font size for "الإجمالية" */
+            font-weight: 600; /* Bolder */
             color: #333;
         }
         #cart-total-container .total-line span:first-child {
-            font-size: 0.9rem; /* Smaller font for labels like "المنتجات", "التوصيل" */
+            font-size: 0.85rem; /* Smaller font for labels like "المنتجات", "التوصيل" */
+            color: #6a737d;
         }
         #cart-total-container .total-line span:last-child {
-            font-size: 1.1rem; /* Slightly larger for values */
+            font-size: 0.95rem; /* Slightly larger for values */
+            color: #2d3748;
         }
         #cart-total-container .total-line.text-lg { /* For "الإجمالي" line */
-            font-size: 1.2rem; /* Adjusted font size for "الإجمالي" */
+            font-size: 1.1rem; /* Adjusted font size for "الإجمالي" */
+            font-weight: 800; /* Extra bold */
+            color: #2563eb; /* Blue-600 - Unified */
         }
         #cart-total-container .delivery-note {
-            font-size: 0.75rem;
-            color: #666;
-            margin-top: 0.5rem;
-            line-height: 1.3;
+            font-size: 0.75rem; /* Slightly smaller */
+            color: #6a737d;
+            margin-top: 0.4rem; /* Reduced margin */
+            line-height: 1.4;
         }
         #checkout-btn {
-            background-color: #6b46c1;
+            background-color: #2563eb; /* Blue-600 - Unified */
             color: white;
-            padding: 0.6rem 1.2rem; /* Adjusted padding for "الشراء" button */
-            border-radius: 10px; /* Slightly smaller border radius */
+            padding: 0.6rem 1.2rem; /* Reduced padding */
+            border-radius: 8px; /* Slightly smaller border radius */
             font-weight: bold;
-            font-size: 1rem; /* Adjusted font size for "الشراء" button */
-            transition: background-color 0.2s ease-in-out;
+            font-size: 0.9rem; /* Smaller font */
+            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
             width: 100%;
-            margin-top: 0.8rem; /* Adjusted margin */
+            margin-top: 0.6rem; /* Reduced margin */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         #checkout-btn:hover {
-            background-color: #5a32a3;
+            background-color: #1d4ed8; /* Blue-700 - Unified */
+            transform: translateY(-3px);
         }
-
 
         /* Store Notes Display */
         #store-notes-display {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 0.75rem;
-            margin: 0.5rem 1rem 1rem 1rem; /* Adjusted top margin to be smaller */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            font-size: 0.9rem;
-            color: #333;
+            background-color: #d1fae5; /* Green-100 - Using a light green for notes, similar to dashboard success */
+            border-radius: 12px; /* More rounded */
+            padding: 0.6rem 1rem; /* Reduced padding */
+            margin: 0.8rem 1.25rem 1.2rem 1.25rem; /* Adjusted margins */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            font-size: 0.85rem; /* Smaller font size */
+            color: #2d3748; /* Darker text */
             text-align: center;
-            line-height: 1.4; /* Ensure full visibility for multi-line */
-            white-space: normal; /* Allow wrapping */
-            overflow: hidden; /* Hide overflow if it somehow still happens */
-            text-overflow: ellipsis; /* Add ellipsis if it truncates */
+            line-height: 1.3; /* Tighter line height */
+            white-space: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            border: 1px solid #a7f3d0; /* Light green border */
         }
 
         /* Modals (Checkout, Notifications, Privacy Policy) */
@@ -617,11 +1035,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.6); /* Darker overlay - Consistent */
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 10000; /* High z-index */
+            z-index: 10000;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
@@ -632,129 +1050,297 @@
         }
         .app-modal-content {
             background-color: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
+            padding: 2rem; /* More padding */
+            border-radius: 20px; /* More rounded */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); /* More prominent shadow */
+            max-width: 450px; /* Wider modal */
             width: 90%;
             max-height: 90%;
             overflow-y: auto;
             position: relative;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.25rem; /* Larger gap */
+            animation: modalSlideUp 0.3s ease-out forwards; /* Entry animation */
+        }
+        @keyframes modalSlideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         .app-modal-close-btn {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 15px; /* Adjusted position */
+            right: 15px; /* Adjusted position */
             background: none;
             border: none;
-            font-size: 1.8rem;
+            font-size: 2rem; /* Larger close button */
             cursor: pointer;
-            color: #4a5568;
+            color: #718096; /* Gray-500 - Consistent */
+            transition: color 0.2s ease-in-out;
         }
         .app-modal-close-btn:hover {
-            color: #2d3748;
+            color: #4a5568; /* Darker gray - Consistent */
         }
         .app-modal-content input, .app-modal-content textarea, .app-modal-content select {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 0.85rem; /* Larger padding */
+            border: 1px solid #d1d5db; /* Gray-300 - Unified */
+            border-radius: 10px; /* More rounded */
             font-size: 1rem;
+            background-color: #f7fafc; /* Very light background - Consistent */
         }
-        .app-modal-content button {
-            background-color: #6b46c1;
+        .app-modal-content button[type="submit"], .app-modal-content button:not(.app-modal-close-btn) {
+            background-color: #2563eb; /* Blue-600 - Unified */
             color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
+            padding: 0.85rem 1.8rem; /* Larger padding */
+            border-radius: 10px; /* More rounded */
             font-weight: bold;
-            transition: background-color 0.2s ease-in-out;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
         }
-        .app-modal-content button:hover {
-            background-color: #5a32a3;
+        .app-modal-content button[type="submit"]:hover, .app-modal-content button:not(.app-modal-close-btn):hover {
+            background-color: #1d4ed8; /* Blue-700 - Unified */
+            transform: translateY(-2px);
         }
         .app-modal-content .checkbox-container {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
+            gap: 0.6rem; /* Slightly larger gap */
+            margin-top: 0.75rem;
         }
         .app-modal-content .checkbox-container input {
             width: auto;
+            transform: scale(1.2); /* Larger checkbox */
+        }
+        .app-modal-content label {
+            font-size: 0.95rem; /* Slightly larger label */
+            color: #4a5568; /* Consistent */
+            margin-bottom: 0.25rem;
+            display: block; /* Ensure label is block for proper spacing */
         }
 
         /* Notification Modal */
         #notification-modal .notification-item {
-            background-color: #f3f4f6;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 0.75rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            background-color: #e5e7eb; /* Gray-200 - Unified */
+            padding: 1.2rem; /* More padding */
+            border-radius: 12px; /* More rounded */
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: background-color 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        #notification-modal .notification-item:hover {
+            background-color: #d1d5db; /* Gray-300 - Unified */
+        }
+        #notification-modal .notification-item.font-bold {
+            background-color: #dbeafe; /* Blue-100 - Unified */
+            border: 1px solid #bfdbfe; /* Blue-200 - Unified */
         }
         #notification-modal .notification-item h4 {
             font-weight: bold;
-            margin-bottom: 0.25rem;
-            color: #333;
+            margin-bottom: 0.3rem;
+            color: #2d3748; /* Consistent */
+            font-size: 1.05rem;
         }
         #notification-modal .notification-item p {
             font-size: 0.9rem;
-            color: #555;
-            margin-bottom: 0.5rem;
+            color: #555; /* Consistent */
+            margin-bottom: 0.6rem;
         }
         #notification-modal .notification-item .timestamp {
-            font-size: 0.75rem;
-            color: #888;
-            text-align: left; /* Align timestamp to left */
+            font-size: 0.8rem;
+            color: #888; /* Consistent */
+            text-align: left;
         }
         #notification-modal .no-notifications {
             text-align: center;
-            color: #888;
+            color: #888; /* Consistent */
+            padding: 1rem;
+            font-size: 1rem;
         }
 
         /* Toast Notification */
         .toast-notification {
             position: fixed;
-            top: 20px;
-            right: 20px; /* Slide from right for RTL */
-            background-color: #6b46c1;
+            top: 25px; /* Slightly lower */
+            right: 25px; /* Slide from right for RTL */
+            background-color: #16a34a; /* Green-600 - Unified with dashboard success green */
             color: white;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            padding: 1.2rem; /* Larger padding */
+            border-radius: 12px; /* More rounded */
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
             z-index: 10001;
             opacity: 0;
-            transform: translateX(100%); /* Start off-screen right */
-            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            transform: translateX(120%); /* Start further off-screen right */
+            transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.45, 0.94); /* Smoother transition */
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            max-width: 250px;
+            gap: 1rem; /* Larger gap */
+            max-width: 300px; /* Wider toast */
         }
         .toast-notification.show {
             opacity: 1;
             transform: translateX(0);
         }
-        .toast-notification .toast-title {
+        /* Style for loading indicator */
+        .loading-indicator {
+            text-align: center;
+            padding: 1rem;
+            color: #6b7280; /* Gray-500 */
+            font-size: 0.9rem;
+        }
+
+        /* Product Details Page - Rating Section */
+        .product-rating-summary {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.1rem; /* Larger font for main rating */
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 0.5rem; /* Space below rating */
+            justify-content: flex-end; /* Align to right */
+        }
+        .product-rating-summary .star-icon {
+            color: #f59e0b; /* Amber for stars */
+            font-size: 1.2rem; /* Larger star size */
+        }
+        .product-rating-summary .total-reviews-count {
+            font-size: 0.9rem;
+            color: #6a737d;
+        }
+
+        /* Review Form */
+        .review-form-section {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            margin-top: 1.5rem;
+        }
+        .review-form-section h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .review-form-section label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 0.4rem;
+        }
+        .review-form-section input[type="text"],
+        .review-form-section textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            background-color: #f7fafc;
+        }
+        .review-form-section textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .review-form-section .rating-stars-input {
+            display: flex;
+            justify-content: center;
+            gap: 0.3rem;
+            margin-bottom: 1rem;
+        }
+        .review-form-section .rating-stars-input .star-input {
+            font-size: 1.8rem;
+            color: #d1d5db; /* Gray for unselected stars */
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+        }
+        .review-form-section .rating-stars-input .star-input.selected,
+        .review-form-section .rating-stars-input .star-input:hover {
+            color: #f59e0b; /* Amber for selected/hovered stars */
+        }
+        .review-form-section button[type="submit"] {
+            width: 100%;
+            background-color: #2563eb;
+            color: white;
+            padding: 0.75rem;
+            border-radius: 8px;
             font-weight: bold;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .review-form-section button[type="submit"]:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Individual Reviews Display */
+        .reviews-list-section {
+            background-color: #f3f4f6; /* Match page background */
+            padding: 1.5rem;
+            margin-top: 0; /* No top margin, separated by divider */
+        }
+        .reviews-list-section h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .review-item {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+        }
+        .review-item .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .review-item .reviewer-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.95rem;
+        }
+        .review-item .review-date {
+            font-size: 0.75rem;
+            color: #6a737d;
+        }
+        .review-item .review-stars {
+            color: #f59e0b; /* Amber for stars */
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .review-item .review-comment {
+            font-size: 0.9rem;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+        .reviews-list-section .no-reviews-message {
+            text-align: center;
+            color: #888;
+            padding: 1rem;
         }
     </style>
 </head>
 <body>
     <!-- Main App Container -->
     <div id="app-container">
-        <!-- Header (Common for all main pages) -->
-        <header>
+        <!-- Main Header (Common for most pages, hidden on product details) -->
+        <header id="main-header">
             <div class="header-icons">
-                <button id="notification-icon" class="header-icon-btn">
+                <button id="notification-icon" class="header-icon-btn" aria-label="الإشعارات">
                     <i class="fas fa-bell"></i>
                     <span id="notification-badge" class="notification-badge hidden">0</span>
                 </button>
-                <button id="email-icon" class="header-icon-btn">
+                <button id="email-icon" class="header-icon-btn" aria-label="البريد الإلكتروني">
                     <i class="fas fa-envelope"></i>
                 </button>
-                <button id="privacy-policy-icon" class="header-icon-btn">
+                <button id="privacy-policy-icon" class="header-icon-btn" aria-label="سياسة الخصوصية">
                     <i class="fas fa-shield-alt"></i>
                 </button>
             </div>
@@ -769,47 +1355,168 @@
                 <!-- Notes will be loaded here -->
             </div>
 
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 px-4">
-                <!-- Search Input -->
-                <input type="text" id="productSearchInput" placeholder="ابحث عن منتج..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
-            </div>
-            
-            <div class="flex flex-wrap justify-center items-center gap-4 mb-6 px-4">
-                <!-- Product Type Filter -->
-                <div class="flex items-center gap-2">
-                    <label for="productTypeFilterStore" class="text-base font-medium text-gray-700">النوع:</label>
-                    <select id="productTypeFilterStore" class="p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm">
+            <!-- New: Search Input and Product Type Filter in one row -->
+            <div class="search-and-type-filter-row">
+                <!-- Search Input with Icon -->
+                <div class="search-input-wrapper">
+                    <input type="text" id="productSearchInput" placeholder="ابحث عن منتج..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <!-- Product Type Filter (Moved here) -->
+                <div class="type-filter-container">
+                    <label for="productTypeFilterStore" class="sr-only">النوع:</label> <!-- Hidden label for accessibility -->
+                    <select id="productTypeFilterStore" class="p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm">
                         <option value="">جميع الأنواع</option>
                         <!-- Product types will be loaded here by JavaScript -->
                     </select>
                 </div>
+            </div>
+            
+            <div class="filter-buttons-container">
+                <!-- New: Best Selling Button -->
+                <button id="showBestSellingBtn" class="bg-gradient-to-r from-teal-500 to-teal-600 text-white px-4 py-2 rounded-lg font-semibold hover:from-teal-600 hover:to-teal-700 transition duration-300 text-sm shadow-md flex items-center justify-center gap-1">
+                    <i class="fas fa-fire text-xs"></i> <!-- أيقونة مناسبة، مثل لهب أو نجمة -->
+                    الأكثر مبيعًا
+                </button>
+                <!-- New: Most Rated Button -->
+                <button id="showMostRatedBtn" class="text-white px-4 py-2 rounded-lg font-semibold transition duration-300 text-sm shadow-md flex items-center justify-center gap-1">
+                    <i class="fas fa-star text-xs"></i>
+                    الأكثر تقييمًا
+                </button>
                 <!-- Offers Button -->
-                <button id="showOffersBtn" class="bg-purple-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-600 transition duration-200 text-sm flex items-center gap-2">
-                    <i class="fas fa-percent"></i>
+                <button id="showOffersBtn" class="bg-gradient-to-r from-[#9333ea] to-[#7e22ce] text-white px-4 py-2 rounded-lg font-semibold hover:from-[#7e22ce] hover:to-[#6b21a8] transition duration-300 text-sm shadow-md flex items-center justify-center gap-1">
+                    <i class="fas fa-percent text-xs"></i>
                     العروض
                 </button>
             </div>
 
-            <div id="products-display" class="px-4 flex-grow">
+            <div id="products-display" class="px-5 flex-grow">
                 <!-- Products will be loaded here by JavaScript -->
                 <p class="text-center text-gray-500 col-span-full">جاري تحميل المنتجات...</p>
             </div>
+            <div id="products-loading-indicator" class="loading-indicator hidden">جاري تحميل المنتجات...</div>
         </section>
 
-        <!-- Product Details Page -->
+        <!-- Product Details Page (New Content from hello (9).html) -->
         <section id="product-details-page" class="page-content">
+            <!-- Custom Header for Product Details Page -->
             <div class="details-header">
-                <button id="backToProductsBtn"><i class="fas fa-chevron-right"></i></button>
+                <button id="backToProductsBtn" aria-label="العودة للمنتجات"><i class="fas fa-chevron-right"></i></button> <!-- Arrow to right -->
                 <h2 id="details-page-title">تفاصيل المنتج</h2>
             </div>
-            <div class="details-content-wrapper">
-                <img id="details-image" src="" alt="صورة المنتج">
-                <h3 id="details-name"></h3>
-                <p id="details-type" class="type"></p>
-                <p id="details-description" class="description"></p>
-                <p id="details-price" class="price"></p>
-                <span id="details-availability" class="availability"></span>
-                <button id="addToCartBtn" class="add-to-cart-btn">أضف إلى السلة</button>
+            
+            <!-- Main Scrollable Content Area -->
+            <div class="product-details-scroll-content">
+                <!-- Product Image Section -->
+                <div class="product-image-section">
+                    <img id="product-image" 
+                         src="https://placehold.co/320x320/E0E7FF/3B82F6?text=Product+Image"
+                         alt="صورة المنتج"
+                         onerror="handleImageError(this);">
+                </div>
+
+                <!-- Horizontal Divider between image and details -->
+                <div class="horizontal-divider"></div>
+
+                <!-- Product Details Section (Removed card styling) -->
+                <div class="product-details-content-main">
+                    <!-- New: Average Rating Display for Product Details -->
+                    <div id="product-details-rating-summary" class="product-rating-summary">
+                        <!-- Stars and average rating will be rendered here -->
+                    </div>
+
+                    <div class="product-type-text">
+                        <span id="product-type">إلكترونيات</span>
+                    </div>
+                    <h1 id="product-title" class="product-title">
+                        هاتف ذكي متطور
+                    </h1>
+                    <p id="product-description" class="product-description">
+                        هذا الهاتف الذكي المتطور يجمع بين الأداء القوي والتصميم الأنيق. يتميز بكاميرا عالية الدقة وبطارية تدوم طويلاً وشاشة عرض مذهلة لتجربة مستخدم لا مثيل لها. مثالي للاستخدام اليومي والألعاب والتصوير الفوتوغرافي.
+                    </p>
+
+                    <div class="price-availability-section">
+                        <div>
+                            <span id="product-price" class="product-price-main">
+                                2,999
+                            </span>
+                            <span class="currency-unit">د.ع</span> <!-- Added currency unit -->
+                            <!-- Removed tax-info span as requested -->
+                        </div>
+                        <div class="availability-status">
+                            <span id="product-availability" class="availability-text">
+                                <span class="text-green-600">متوفر</span>
+                            </span>
+                            <svg class="availability-icon" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="color-options-section">
+                        <!-- Removed static h3 for "الألوان المتوفرة:" to prevent duplication -->
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">الألوان المتوفرة:</h3>
+                        <div id="color-options" class="color-swatch-container">
+                            <!-- Color options will be dynamically added here by JavaScript as buttons -->
+                            <!-- Example: <button class="color-button" data-color="blue" data-image="...">أزرق</button> -->
+                            <p class="text-gray-500 text-sm w-full text-center hidden" id="no-colors-message-details">لا توجد خيارات ألوان لهذا المنتج.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Horizontal Divider between details and suggested products -->
+                <div class="horizontal-divider"></div>
+
+                <!-- Suggested Products Section -->
+                <div class="suggested-products-section">
+                    <h3>قد تعجبك أيضاً</h3>
+                    <div id="suggested-products-carousel" class="suggested-products-carousel">
+                        <!-- Suggested products will be loaded here by JavaScript -->
+                        <p class="text-center text-gray-500 w-full">جاري تحميل الاقتراحات...</p>
+                    </div>
+                </div>
+
+                <!-- Horizontal Divider between suggested products and reviews -->
+                <div class="horizontal-divider"></div>
+
+                <!-- Review Form Section -->
+                <div class="review-form-section px-5">
+                    <h3>أضف تقييمك وتعليقك</h3>
+                    <form id="review-form">
+                        <label for="reviewer-name">اسمك:</label>
+                        <input type="text" id="reviewer-name" placeholder="ادخل اسمك" required>
+
+                        <label for="review-rating">تقييمك:</label>
+                        <div id="review-rating-stars" class="rating-stars-input">
+                            <i class="far fa-star star-input" data-rating="1"></i>
+                            <i class="far fa-star star-input" data-rating="2"></i>
+                            <i class="far fa-star star-input" data-rating="3"></i>
+                            <i class="far fa-star star-input" data-rating="4"></i>
+                            <i class="far fa-star star-input" data-rating="5"></i>
+                        </div>
+                        <input type="hidden" id="selected-rating" value="0" required> <!-- Hidden field to store selected rating -->
+
+                        <label for="review-comment">تعليقك:</label>
+                        <textarea id="review-comment" placeholder="اكتب تعليقك هنا..." rows="4" required></textarea>
+
+                        <button type="submit">إرسال التقييم</button>
+                    </form>
+                </div>
+
+                <!-- Reviews List Section -->
+                <div class="reviews-list-section">
+                    <h3>تقييمات وتعليقات العملاء (<span id="reviews-count">0</span>)</h3>
+                    <div id="product-reviews-display">
+                        <p class="no-reviews-message">لا توجد تقييمات لهذا المنتج بعد.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fixed Add to Cart Button Container -->
+            <div id="fixed-add-to-cart-bar" class="fixed-add-to-cart-bar">
+                <button id="add-to-cart-btn" class="add-to-cart-button">
+                    إضافة إلى السلة
+                </button>
             </div>
         </section>
 
@@ -821,7 +1528,7 @@
             </div>
             <div class="chat-input-area">
                 <input type="text" id="chat-input" placeholder="اكتب سؤالك هنا...">
-                <button id="send-chat-btn"><i class="fas fa-paper-plane"></i></button>
+                <button id="send-chat-btn" aria-label="إرسال رسالة"><i class="fas fa-paper-plane"></i></button>
             </div>
         </section>
 
@@ -829,7 +1536,7 @@
         <section id="cart-page" class="page-content">
             <div id="cart-items-container" class="cart-items-container">
                 <!-- Cart items will be loaded here -->
-                <p class="text-center text-gray-500">سلتك فارغة حالياً.</p>
+                <p class="text-center text-gray-500 p-4">سلتك فارغة حالياً.</p>
             </div>
             <div id="cart-total-container">
                 <div class="total-line">
@@ -840,7 +1547,7 @@
                     <span>التوصيل:</span>
                     <span id="delivery-cost">0.00 IQD</span>
                 </div>
-                <div class="total-line text-lg font-extrabold text-purple-700">
+                <div class="total-line text-lg font-extrabold text-blue-600"> <!-- Unified color -->
                     <span>الإجمالي:</span>
                     <span id="final-total">0.00 IQD</span>
                 </div>
@@ -848,7 +1555,7 @@
                     ملاحظات التوصيل: عند طلب كتب: البصرة (3,000 IQD)، باقي محافظات العراق (5,000 IQD).
                     عند طلب منتجات أخرى: الناصرية (3,000 IQD)، باقي محافظات العراق (5,000 IQD).
                 </p>
-                <button id="checkout-btn">إتمام عملية الشراء</button>
+                <button id="checkout-btn" class="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-md hover:bg-blue-700 transition duration-300 transform hover:scale-105">إتمام عملية الشراء</button>
             </div>
         </section>
 
@@ -871,59 +1578,59 @@
     </div>
 
     <!-- Checkout Modal -->
-    <div id="checkout-modal" class="app-modal">
+    <div id="checkout-modal" class="app-modal hidden">
         <div class="app-modal-content">
-            <button class="app-modal-close-btn" id="close-checkout-modal">&times;</button>
-            <h3 class="text-xl font-bold text-center mb-4">إتمام عملية الشراء</h3>
+            <button class="app-modal-close-btn" id="close-checkout-modal" aria-label="إغلاق">&times;</button>
+            <h3 class="text-2xl font-bold text-center mb-4 text-gray-800">إتمام عملية الشراء</h3>
             <form id="checkout-form" action="https://formspree.io/f/xvgqkzbo" method="POST"> <!-- REPLACE WITH YOUR FORMSPREE FORM ID -->
-                <label for="governorate" class="block text-sm font-medium text-gray-700 mb-1">المحافظة:</label>
-                <select id="governorate" name="المحافظة" class="mb-3">
+                <label for="governorate" class="block text-base font-medium text-gray-700 mb-2">المحافظة:</label>
+                <select id="governorate" name="المحافظة" class="mb-4">
                     <option value="">اختر محافظتك</option>
                     <!-- Governorates will be populated by JS -->
                 </select>
 
-                <label for="area" class="block text-sm font-medium text-gray-700 mb-1">المنطقة:</label>
-                <input type="text" id="area" name="المنطقة" placeholder="ادخل المنطقة" class="mb-3">
+                <label for="area" class="block text-base font-medium text-gray-700 mb-2">المنطقة:</label>
+                <input type="text" id="area" name="المنطقة" placeholder="ادخل المنطقة" class="mb-4">
 
-                <label for="landmark" class="block text-sm font-medium text-gray-700 mb-1">أقرب نقطة دالة:</label>
-                <input type="text" id="landmark" name="أقرب نقطة دالة" placeholder="مثال: قرب جامع النور" class="mb-3">
+                <label for="landmark" class="block text-base font-medium text-gray-700 mb-2">أقرب نقطة دالة:</label>
+                <input type="text" id="landmark" name="أقرب نقطة دالة" placeholder="مثال: قرب جامع النور" class="mb-4">
 
-                <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف:</label>
-                <input type="tel" id="phoneNumber" name="رقم الهاتف" placeholder="مثال: 07701234567" class="mb-3">
+                <label for="phoneNumber" class="block text-base font-medium text-gray-700 mb-2">رقم الهاتف:</label>
+                <input type="tel" id="phoneNumber" name="رقم الهاتف" placeholder="مثال: 07701234567" class="mb-4">
 
-                <label for="totalPriceForm" class="block text-sm font-medium text-gray-700 mb-1">السعر الكلي للطلب:</label>
-                <input type="text" id="totalPriceForm" name="السعر الكلي للطلب" readonly class="mb-3 bg-gray-100">
+                <label for="totalPriceForm" class="block text-base font-medium text-gray-700 mb-2">السعر الكلي للطلب:</label>
+                <input type="text" id="totalPriceForm" name="الSعر الكلي للطلب" readonly class="mb-4 bg-gray-100 cursor-not-allowed">
 
-                <label for="additionalNotes" class="block text-sm font-medium text-gray-700 mb-1">ملاحظات إضافية (اختياري):</label>
-                <textarea id="additionalNotes" name="ملاحظات إضافية" rows="3" placeholder="أي تفاصيل إضافية للطلب" class="mb-3"></textarea>
+                <label for="additionalNotes" class="block text-base font-medium text-gray-700 mb-2">ملاحظات إضافية (اختياري):</label>
+                <textarea id="additionalNotes" name="ملاحظات إضافية" rows="4" placeholder="أي تفاصيل إضافية للطلب" class="mb-4"></textarea>
 
                 <div class="checkbox-container">
-                    <input type="checkbox" id="saveAddressCheckbox" class="h-4 w-4">
-                    <label for="saveAddressCheckbox" class="text-sm">حفظ العنوان للمرة القادمة</label>
+                    <input type="checkbox" id="saveAddressCheckbox" class="h-5 w-5 rounded text-blue-600 focus:ring-blue-500"> <!-- Unified with blue-600 -->
+                    <label for="saveAddressCheckbox" class="text-base text-gray-700">حفظ العنوان للمرة القادمة</label>
                 </div>
-                <p id="saveAddressTip" class="text-xs text-gray-500 mt-1 hidden">عند تفعيل هذه الميزة، لن تحتاج لإدخال المعلومات في المرة القادمة، فقط اضغط على زر الشراء.</p>
-                <button type="submit" class="mt-4">تأكيد الشراء</button>
+                <p id="saveAddressTip" class="text-sm text-gray-500 mt-2 hidden">عند تفعيل هذه الميزة، لن تحتاج لإدخال المعلومات في المرة القادمة، فقط اضغط على زر الشراء.</p>
+                <button type="submit" class="mt-6 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold text-lg shadow-md hover:bg-blue-700 transition duration-300 transform hover:scale-105">تأكيد الشراء</button>
             </form>
         </div>
     </div>
 
     <!-- Notification Modal -->
-    <div id="notification-modal" class="app-modal">
+    <div id="notification-modal" class="app-modal hidden">
         <div class="app-modal-content">
-            <button class="app-modal-close-btn" id="close-notification-modal">&times;</button>
-            <h3 class="text-xl font-bold text-center mb-4">الإشعارات</h3>
-            <div id="notifications-list" class="flex flex-col gap-3">
+            <button class="app-modal-close-btn" id="close-notification-modal" aria-label="إغلاق">&times;</button>
+            <h3 class="text-2xl font-bold text-center mb-4 text-gray-800">الإشعارات</h3>
+            <div id="notifications-list" class="flex flex-col gap-4">
                 <p class="no-notifications">لا توجد إشعارات حالياً.</p>
             </div>
         </div>
     </div>
 
     <!-- Privacy Policy Modal -->
-    <div id="privacy-policy-modal" class="app-modal">
+    <div id="privacy-policy-modal" class="app-modal hidden">
         <div class="app-modal-content">
-            <button class="app-modal-close-btn" id="close-privacy-policy-modal">&times;</button>
-            <h3 class="text-xl font-bold text-center mb-4">سياسة الخصوصية</h3>
-            <p class="text-gray-700 text-sm leading-relaxed">
+            <button class="app-modal-close-btn" id="close-privacy-policy-modal" aria-label="إغلاق">&times;</button>
+            <h3 class="text-2xl font-bold text-center mb-4 text-gray-800">سياسة الخصوصية</h3>
+            <p class="text-gray-700 text-base leading-relaxed">
                 نحن في متجر TERAKS نلتزم بحماية خصوصيتك. يتم استخدام معلوماتك الشخصية فقط لإتمام طلباتك وتحسين تجربتك في المتجر. نحن لا نشارك بياناتك مع أطراف ثالثة.
             </p>
         </div>
@@ -931,10 +1638,22 @@
 
     <!-- Toast Notification (for new notifications) -->
     <div id="toast-notification" class="toast-notification">
-        <i class="fas fa-bell"></i>
+        <i class="fas fa-bell text-2xl"></i>
         <div>
             <div class="toast-title"></div>
-            <div class="toast-content text-xs"></div>
+            <div class="toast-content"></div>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Modal (replaces window.confirm) -->
+    <div id="custom-confirm-modal" class="app-modal hidden">
+        <div class="app-modal-content">
+            <h3 id="custom-confirm-title" class="text-xl font-bold text-center mb-4"></h3>
+            <p id="custom-confirm-message" class="text-gray-700 text-center mb-6"></p>
+            <div class="flex justify-around gap-4">
+                <button id="confirmBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg flex-1 shadow-md">موافق</button>
+                <button id="cancelBtn" class="bg-gray-400 hover:bg-gray-500 text-white px-5 py-2 rounded-lg flex-1 shadow-md">إلغاء</button>
+            </div>
         </div>
     </div>
 
@@ -942,14 +1661,14 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, getDocs, doc, updateDoc, enableIndexedDbPersistence, addDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, getDocs, doc, updateDoc, enableIndexedDbPersistence, addDoc, Timestamp, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Firebase Configuration (from your 'store-ced42' project)
         const firebaseConfig = {
             apiKey: "AIzaSyByoPYBjMigsno_66nwa6L4q33shpmJDi8",
             authDomain: "store-ced42.firebaseapp.com",
-            projectId: "store-ced42",
-            storageBucket: "store-ced42.firebasestorage.app",
+            projectId: "store-ced42", 
+            storageBucket: "store-ced42.appspot.com",
             messagingSenderId: "519838982253",
             appId: "1:519838982253:web:6c466eb08a708f5e4b9f64",
             measurementId: "G-MY39NRV7PE"
@@ -961,7 +1680,7 @@
 
         // The app ID used for the Firestore path (should match projectId)
         // Using __app_id from Canvas environment if available, otherwise fallback to projectId
-        const APP_ID_FOR_FIRESTORE_PATH = "store-ced42";
+        const APP_ID_FOR_FIRESTORE_PATH = typeof __app_id !== 'undefined' ? __app_id : 'store-ced42';
 
         let app;
         let db;
@@ -975,11 +1694,18 @@
         let unreadNotificationsCount = 0;
         let lastNotificationTimestamp = 0; // To track new notifications
 
-        let currentFilter = 'all'; // 'all', 'offers', or a product type
+        let currentFilter = 'all'; // 'all', 'offers', 'best-selling', 'most-rated' or a product type
         let cartItems = []; 
+        let selectedProductColor = null; // To store the selected color for the current product
+        let isNavigating = false; // Flag to prevent rapid navigation issues
+
+        // Context for Layla's conversation
+        let lastProductDiscussed = null; // Stores the ID of the last product Layla discussed
+        let lastIntentType = null; // Stores the type of the last intent matched
 
         // UI Elements
         const appContainer = document.getElementById('app-container');
+        const mainHeader = document.getElementById('main-header'); // Get the main header
         const headerTitle = document.getElementById('header-title'); 
         const productsPage = document.getElementById('products-page');
         const productDetailsPage = document.getElementById('product-details-page');
@@ -993,24 +1719,41 @@
         const productSearchInput = document.getElementById('productSearchInput'); 
         const productTypeFilterStore = document.getElementById('productTypeFilterStore');
         const showOffersBtn = document.getElementById('showOffersBtn');
+        const showBestSellingBtn = document.getElementById('showBestSellingBtn'); 
+        const showMostRatedBtn = document.getElementById('showMostRatedBtn'); // New: Most Rated button
         const storeNotesDisplay = document.getElementById('store-notes-display'); 
+        const productsLoadingIndicator = document.getElementById('products-loading-indicator'); 
 
         // Header Icons
         const notificationIcon = document.getElementById('notification-icon');
         const notificationBadge = document.getElementById('notification-badge');
         const emailIcon = document.getElementById('email-icon');
         const privacyPolicyIcon = document.getElementById('privacy-policy-icon');
+        const headerIcons = document.querySelector('.header-icons'); 
 
-        // Product Details Page Elements
+        // Product Details Page Elements (from hello (9).html, updated IDs)
         const backToProductsBtn = document.getElementById('backToProductsBtn');
-        const detailsPageTitle = document.getElementById('details-page-title');
-        const detailsImage = document.getElementById('details-image');
-        const detailsName = document.getElementById('details-name');
-        const detailsType = document.getElementById('details-type');
-        const detailsDescription = document.getElementById('details-description');
-        const detailsPrice = document.getElementById('details-price');
-        const detailsAvailability = document.getElementById('details-availability');
-        const addToCartBtn = document.getElementById('addToCartBtn');
+        const detailsPageTitle = document.getElementById('details-page-title'); // This is the title in the new header
+        const productImage = document.getElementById('product-image'); // Main product image
+        const productType = document.getElementById('product-type'); // Product type text
+        const productTitle = document.getElementById('product-title'); // Product title
+        const productDescription = document.getElementById('product-description'); // Product description
+        const productPrice = document.getElementById('product-price'); // Product price
+        const productAvailability = document.getElementById('product-availability'); // Product availability text
+        const colorOptionsContainer = document.getElementById('color-options'); // Color options container
+        const noColorsMessageDetails = document.getElementById('no-colors-message-details'); // No colors message on details page
+        const addToCartButton = document.getElementById('add-to-cart-btn'); // Add to cart button
+        const suggestedProductsCarousel = document.getElementById('suggested-products-carousel'); // Suggested products carousel
+        const productDetailsRatingSummary = document.getElementById('product-details-rating-summary'); // New: Rating summary on details page
+
+        // Review Form Elements
+        const reviewForm = document.getElementById('review-form');
+        const reviewerNameInput = document.getElementById('reviewer-name');
+        const reviewRatingStars = document.getElementById('review-rating-stars');
+        const selectedRatingInput = document.getElementById('selected-rating');
+        const reviewCommentInput = document.getElementById('review-comment');
+        const productReviewsDisplay = document.getElementById('product-reviews-display'); // Container for reviews
+        const reviewsCountSpan = document.getElementById('reviews-count'); // Reviews count span
 
         // Chat Page Elements
         const chatMessagesContainer = document.getElementById('chat-messages-container');
@@ -1052,8 +1795,59 @@
         const toastTitle = toastNotification.querySelector('.toast-title');
         const toastContent = toastNotification.querySelector('.toast-content');
 
+        // Custom Confirm Modal Elements
+        const customConfirmModal = document.getElementById('custom-confirm-modal');
+        const customConfirmTitle = document.getElementById('custom-confirm-title');
+        const customConfirmMessage = document.getElementById('custom-confirm-message');
+        let customConfirmOnConfirm;
+        let customConfirmOnCancel;
+
 
         // --- Utility Functions ---
+
+        /**
+         * Generic debounce function to limit how often a function can run.
+         * @param {Function} func - The function to debounce.
+         * @param {number} delay - The delay in milliseconds.
+         * @returns {Function} A debounced version of the function.
+         */
+        function debounce(func, delay) {
+            let timeout;
+            return function(...args) {
+                const context = this;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), delay);
+            };
+        }
+
+        /**
+         * Sanitizes HTML input to prevent XSS attacks.
+         * @param {string} text - The input string to sanitize.
+         * @returns {string} The sanitized string.
+         */
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#x27;',
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+        /**
+         * Handles image loading errors by replacing the src with a placeholder.
+         * @param {HTMLImageElement} img - The image element that failed to load.
+         */
+        function handleImageError(img) {
+            img.onerror = null; // Prevent infinite loop if placeholder also fails
+            img.src = 'https://placehold.co/300x300/e0e0e0/000?text=صورة+غير+متوفرة'; // Default placeholder
+            // For product details page, use a larger placeholder
+            if (img.id === 'product-image') { // Updated ID for the new details page
+                img.src = 'https://placehold.co/320x320/e0e0e0/000?text=صورة+غير+متوفرة';
+            }
+        }
 
         /**
          * Navigates to a specific page.
@@ -1062,55 +1856,92 @@
          * @param {boolean} [isBack=false] - True if navigating back (for animation).
          */
         function navigateTo(targetPage, title, isBack = false) {
+            if (isNavigating) return; // Prevent multiple rapid navigations
+            isNavigating = true;
+
             const currentPage = document.querySelector('.page-content.active');
-            if (currentPage === targetPage) return;
+            
+            // Hide/Show main header based on target page
+            if (targetPage === productDetailsPage) {
+                mainHeader.style.display = 'none'; // Hide the main blue header completely
+                // The details-header within productDetailsPage will now be visible
+            } else {
+                mainHeader.style.display = 'flex'; // Show it for other pages
+            }
+
+            // Check if current page is the same as target page to prevent unnecessary re-renders/transitions
+            if (currentPage && currentPage.id === targetPage.id) {
+                updateActiveNavItem(targetPage.id); // Call helper function
+                isNavigating = false; // Reset flag as no actual navigation occurred
+                return;
+            }
 
             if (currentPage) {
                 currentPage.classList.remove('active');
                 if (!isBack) {
                     currentPage.classList.add('slide-out');
                 }
+                // Wait for the slide-out animation to complete before hiding the old page
                 setTimeout(() => {
                     currentPage.style.display = 'none';
                     currentPage.classList.remove('slide-out', 'from-left');
-                }, 300);
+                }, 300); // Matches CSS transition duration
             }
 
             // Always update the header title
-            headerTitle.textContent = title;
+            // Note: For productDetailsPage, its own header will handle the title.
+            if (targetPage !== productDetailsPage) {
+                headerTitle.textContent = title;
+            }
             
+            // Show the target page and immediately apply 'active' class to start transition
             targetPage.style.display = 'flex';
-            setTimeout(() => {
-                targetPage.classList.add('active');
-                if (isBack) {
-                    targetPage.classList.add('from-left');
-                } else {
-                    targetPage.classList.remove('from-left');
-                }
-            }, 50);
+            // Force reflow to ensure transitions apply correctly
+            void targetPage.offsetHeight; 
+            targetPage.classList.add('active');
+            if (isBack) {
+                targetPage.classList.add('from-left');
+            } else {
+                targetPage.classList.remove('from-left');
+            }
 
-            navItems.forEach(item => {
-                item.classList.remove('active');
-                if (item.dataset.page === targetPage.id) {
-                    item.classList.add('active');
-                }
-            });
+            // Update active state for bottom navigation items
+            updateActiveNavItem(targetPage.id); // Call helper function
 
+            // Control visibility of bottom navigation
             if (targetPage === productDetailsPage) {
                 bottomNav.style.display = 'none';
             } else {
                 bottomNav.style.display = 'flex';
             }
+
+            // Reset navigation flag after transition completes
+            setTimeout(() => {
+                isNavigating = false;
+            }, 300); // Match transition duration
+        }
+
+        /**
+         * Helper function to update the active state of bottom navigation items.
+         * @param {string} activePageId - The ID of the currently active page.
+         */
+        function updateActiveNavItem(activePageId) {
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === activePageId) {
+                    item.classList.add('active');
+                }
+            });
         }
 
         /**
          * Simple alert message (replaces alert()).
-         * @param {string} message
-         * @param {'success'|'info'|'error'} type
+         * @param {string} message - The message to display.
+         * @param {'success'|'info'|'error'} type - The type of message (determines color).
          */
         function alertMessage(message, type) {
             const alertDiv = document.createElement('div');
-            alertDiv.classList.add('fixed', 'top-4', 'left-1/2', '-translate-x-1/2', 'z-[10000]', 'px-4', 'py-2', 'rounded-lg', 'text-white', 'font-semibold', 'shadow-lg');
+            alertDiv.classList.add('fixed', 'top-4', 'left-1/2', '-translate-x-1/2', 'z-[10000]', 'px-5', 'py-3', 'rounded-xl', 'text-white', 'font-semibold', 'shadow-lg', 'text-center');
             if (type === 'success') {
                 alertDiv.classList.add('bg-green-500');
             } else if (type === 'info') {
@@ -1127,7 +1958,7 @@
 
         /**
          * Shows a modal.
-         * @param {HTMLElement} modalElement
+         * @param {HTMLElement} modalElement - The modal element to show.
          */
         function showModal(modalElement) {
             modalElement.classList.add('open');
@@ -1136,7 +1967,7 @@
 
         /**
          * Hides a modal.
-         * @param {HTMLElement} modalElement
+         * @param {HTMLElement} modalElement - The modal element to hide.
          */
         function hideModal(modalElement) {
             modalElement.classList.remove('open');
@@ -1207,7 +2038,7 @@
          */
         function setupFirestoreListeners() {
             if (!db || !clientUserId) { // Use clientUserId here
-                console.warn("Firestore or clientUserId not ready for listeners.");
+                console.warn("Firestore or clientUserId not ready for listeners. Skipping.");
                 return;
             }
 
@@ -1218,13 +2049,18 @@
                 const productTypes = new Set(); 
                 snapshot.forEach(doc => {
                     const productData = { id: doc.id, ...doc.data() };
+                    // Ensure salesCount, averageRating, totalReviews are numbers, default to 0 if not present
+                    productData.salesCount = typeof productData.salesCount === 'number' ? productData.salesCount : 0;
+                    productData.averageRating = typeof productData.averageRating === 'number' ? productData.averageRating : 0;
+                    productData.totalReviews = typeof productData.totalReviews === 'number' ? productData.totalReviews : 0;
+
                     allProducts.push(productData);
                     if (productData.type) {
                         productTypes.add(productData.type);
                     }
                 });
                 populateProductTypeFilterStore(Array.from(productTypes)); 
-                applyProductFilter(); 
+                applyProductFilter(); // Call applyProductFilter directly to display products
                 console.log("Products updated in real-time.");
             }, (error) => {
                 console.error("Error fetching products in store:", error);
@@ -1301,7 +2137,23 @@
             });
         }
 
-        // --- Product Display & Filtering ---
+        /**
+         * Helper function to check if a product is considered a "book".
+         * Prioritizes the 'isBook' boolean from Firestore, falls back to type keywords.
+         * @param {Object} product - The product object.
+         * @returns {boolean} True if the product is a book, false otherwise.
+         */
+        function isBook(product) {
+            // If 'isBook' property exists, use it directly
+            if (typeof product.isBook === 'boolean') {
+                return product.isBook;
+            }
+            // Fallback to keyword checking if 'isBook' property is not explicitly set
+            const bookKeywords = ['كتاب', 'رواية', 'أدبي', 'قصة', 'ديوان'];
+            const productTypeName = product.type ? product.type.toLowerCase() : '';
+            return bookKeywords.some(keyword => productTypeName.includes(keyword));
+        }
+
         /**
          * Populates the product type filter dropdown.
          * @param {string[]} types - Array of unique product types.
@@ -1320,16 +2172,52 @@
         }
 
         /**
-         * Applies the selected filter (all, offers, or specific type) and displays products.
+         * Renders star icons based on a given rating.
+         * @param {number} rating - The rating out of 5.
+         * @returns {string} HTML string of star icons.
+         */
+        function renderStars(rating) {
+            let starsHtml = '';
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+
+            for (let i = 0; i < fullStars; i++) {
+                starsHtml += '<i class="fas fa-star star-icon"></i>';
+            }
+            if (halfStar) {
+                starsHtml += '<i class="fas fa-star-half-alt star-icon"></i>';
+            }
+            for (let i = 0; i < emptyStars; i++) {
+                starsHtml += '<i class="far fa-star star-icon"></i>'; // Outline star for empty
+            }
+            return starsHtml;
+        }
+
+        /**
+         * Applies the selected filter (all, offers, best-selling, or specific type) and displays products.
          */
         function applyProductFilter() {
+            productsLoadingIndicator.classList.remove('hidden'); // Show loading indicator
+            
             let productsToDisplay = allProducts;
             const searchTerm = productSearchInput.value.toLowerCase();
 
+            // تطبيق الفلتر بناءً على currentFilter
             if (currentFilter === 'offers') {
                 productsToDisplay = allProducts.filter(product => product.isOffer === true);
-            } else if (currentFilter !== 'all' && currentFilter !== '') {
-                productsToDisplay = allProducts.filter(product => product.type === currentFilter);
+            } else if (currentFilter === 'best-selling') {
+                // Sort by salesCount (descending) and take top 20
+                productsToDisplay = allProducts.sort((a, b) => (b.salesCount || 0) - (a.salesCount || 0)).slice(0, 20); 
+            } else if (currentFilter === 'most-rated') { // New: Most Rated filter
+                // Sort by averageRating (descending) and filter out products with no reviews
+                productsToDisplay = allProducts
+                    .filter(product => product.totalReviews > 0) // Only show products with reviews
+                    .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
+                    .slice(0, 20); // Show top 20 most rated
+            }
+            else if (currentFilter !== 'all' && currentFilter !== '') {
+                productsToDisplay = productsToDisplay.filter(product => product.type === currentFilter);
             }
             
             // Apply search term filter
@@ -1337,60 +2225,85 @@
                 productsToDisplay = productsToDisplay.filter(product => 
                     product.name.toLowerCase().includes(searchTerm) ||
                     product.description.toLowerCase().includes(searchTerm) ||
-                    (product.type && product.type.toLowerCase().includes(searchTerm))
+                    (product.type && product.type.toLowerCase().includes(searchTerm)) ||
+                    (product.keywords && product.keywords.some(k => k.toLowerCase().includes(searchTerm))) // Search in new keywords
                 );
             }
-
-            displayProducts(productsToDisplay);
-
-            if (productsToDisplay.length === 0) {
-                productsDisplay.innerHTML = `<p class="text-center text-gray-500 w-full">لا توجد منتجات ${currentFilter === 'offers' ? 'ضمن العروض' : currentFilter === 'all' ? 'لعرضها حالياً' : `من نوع "${currentFilter}"`} حالياً.</p>`;
-            }
-        }
-
-        /**
-         * Displays products on the store front-end.
-         * @param {Array<Object>} products - Array of product objects.
-         */
-        function displayProducts(products) {
-            productsDisplay.innerHTML = ''; 
-            if (products.length === 0) {
-                return;
-            }
             
-            // Display products in two columns
-            products.forEach(product => {
-                const productCard = document.createElement('div');
-                productCard.classList.add('product-card');
-                productCard.innerHTML = `
-                    <img src="${product.imageUrl || `https://placehold.co/300x300/e0e0e0/000?text=${product.name}`}" alt="${product.name}" onerror="this.onerror=null;this.src='https://placehold.co/300x300/e0e0e0/000?text=صورة+غير+متوفرة';">
-                    <div class="product-card-info">
-                        <h3>${product.name}</h3>
-                        <p class="price">${parseFloat(product.price).toFixed(0)} IQD</p>
-                        <span class="availability ${
-                            product.availability === 'متوفر' ? 'bg-green-100 text-green-800' :
-                            product.availability === 'غير متوفر' ? 'bg-red-100 text-red-800' :
-                            'bg-blue-100 text-blue-800'
-                        }">
+            // Clear products and display all filtered products
+            productsDisplay.innerHTML = ''; 
+            if (productsToDisplay.length === 0) {
+                let message = 'لا توجد منتجات لعرضها حالياً.';
+                if (currentFilter === 'offers') {
+                    message = 'لا توجد منتجات ضمن العروض حالياً.';
+                } else if (currentFilter === 'best-selling') {
+                    message = 'لا توجد منتجات مصنفة كـ "الأكثر مبيعًا" حالياً.';
+                } else if (currentFilter === 'most-rated') {
+                    message = 'لا توجد منتجات مصنفة كـ "الأكثر تقييمًا" حالياً.';
+                } else if (currentFilter !== 'all' && currentFilter !== '') {
+                    message = `لا توجد منتجات من نوع "${currentFilter}" حالياً.`;
+                }
+                productsDisplay.innerHTML = `<p class="text-center text-gray-500 w-full col-span-full">${message}</p>`;
+            } else {
+                productsToDisplay.forEach((product, index) => {
+                    // Add check for essential product data before rendering
+                    if (!product.name || !product.price) {
+                        console.warn("Skipping product due to missing name or price:", product);
+                        return; 
+                    }
+
+                    const productCard = document.createElement('div');
+                    productCard.classList.add('product-card');
+                    // Apply animation delay for staggered effect
+                    productCard.style.animationDelay = `${index * 0.05}s`; 
+
+                    productCard.onclick = () => showProductDetails(product.id);
+
+                    const isProductAvailable = product.availability === 'متوفر';
+                    const availabilityClass = product.availability === 'متوفر' ? 'available' : 
+                                              product.availability === 'غير متوفر' ? 'unavailable' : 'soon';
+                    const addToCartButtonDisabled = isProductAvailable ? '' : 'disabled';
+
+                    // Render rating stars for product card (NEW POSITION)
+                    const cardRatingHtml = product.totalReviews > 0 ? 
+                        `<div class="rating-display">
+                            ${renderStars(product.averageRating)}
+                            <span>(${product.totalReviews})</span>
+                        </div>` : 
+                        `<div class="rating-display no-rating">
+                            ${renderStars(0)} <!-- Show 5 empty stars for new products -->
+                            <span>(جديد)</span>
+                        </div>`;
+
+
+                    productCard.innerHTML = `
+                        <span class="availability-badge ${availabilityClass}">
                             ${product.availability}
                         </span>
-                        <div class="buttons-container">
-                            <button data-id="${product.id}" class="view-details-btn">التفاصيل</button>
-                            <button data-id="${product.id}" class="add-to-cart-btn-card"><i class="fas fa-cart-plus"></i></button>
+                        <img src="${product.imageUrl || `https://placehold.co/300x300/e0e0e0/000?text=${product.name}`}" alt="${product.name}" onerror="handleImageError(this);">
+                        <div class="product-card-info">
+                            ${cardRatingHtml} <!-- NEW POSITION: Inside product-card-info, above h3 -->
+                            <h3>${product.name}</h3>
+                            <div class="price-and-cart">
+                                <p class="price">${parseInt(product.price.replace(/,/g, '')).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p> <!-- Removed currency here -->
+                                <button data-id="${product.id}" class="add-to-cart-btn-card" aria-label="أضف إلى السلة" ${addToCartButtonDisabled}>
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                `;
-                productsDisplay.appendChild(productCard);
-            });
+                    `;
+                    productsDisplay.appendChild(productCard);
+                });
+            }
+            productsLoadingIndicator.classList.add('hidden'); // Hide loading indicator
 
-            document.querySelectorAll('.view-details-btn').forEach(button => {
-                button.onclick = (e) => showProductDetails(e.target.dataset.id);
-            });
+            // Attach event listeners for add-to-cart buttons after they are rendered
             document.querySelectorAll('.add-to-cart-btn-card').forEach(button => {
                 button.onclick = (e) => {
-                    const productId = e.target.dataset.id || e.target.closest('button').dataset.id;
+                    e.stopPropagation(); // Prevent card click when button is clicked
+                    const productId = e.currentTarget.dataset.id;
                     const productToAdd = allProducts.find(p => p.id === productId);
-                    if (productToAdd) {
+                    if (productToAdd && !e.currentTarget.disabled) {
                         addProductToCart(productToAdd);
                     }
                 };
@@ -1398,41 +2311,187 @@
         }
 
         /**
+         * Displays 10 random products/books in the "Suggested Products" carousel.
+         * @param {string} currentProductId - The ID of the product currently being viewed, to exclude it.
+         */
+        function displaySuggestedProducts(currentProductId) {
+            suggestedProductsCarousel.innerHTML = ''; // Clear previous suggestions
+            const availableProducts = allProducts.filter(p => p.id !== currentProductId);
+
+            if (availableProducts.length === 0) {
+                suggestedProductsCarousel.innerHTML = '<p class="text-center text-gray-500 w-full">لا توجد اقتراحات حالياً.</p>';
+                return;
+            }
+
+            // Shuffle and pick up to 10 random products
+            const shuffledProducts = availableProducts.sort(() => 0.5 - Math.random());
+            const productsToShow = shuffledProducts.slice(0, 10);
+
+            if (productsToShow.length === 0) {
+                suggestedProductsCarousel.innerHTML = '<p class="text-center text-gray-500 w-full">لا توجد اقتراحات حالياً.</p>';
+                return;
+            }
+
+            productsToShow.forEach(product => {
+                const suggestedCard = document.createElement('div');
+                suggestedCard.classList.add('suggested-product-card');
+                suggestedCard.onclick = () => showProductDetails(product.id); // Allow clicking on suggested products
+
+                suggestedCard.innerHTML = `
+                    <img src="${product.imageUrl || `https://placehold.co/140x100/e0e0e0/000?text=${product.name}`}" alt="${product.name}" onerror="handleImageError(this);">
+                    <div class="suggested-product-card-info">
+                        <h4>${product.name}</h4>
+                        <p>${parseInt(product.price.replace(/,/g, '')).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} د.ع</p>
+                    </div>
+                `;
+                suggestedProductsCarousel.appendChild(suggestedCard);
+            });
+        }
+
+
+        /**
          * Shows the product details page with the given product's information.
          * @param {string} productId - The ID of the product to display.
          */
-        function showProductDetails(productId) {
+        async function showProductDetails(productId) {
             const product = allProducts.find(p => p.id === productId);
             if (product) {
-                detailsPageTitle.textContent = product.name; 
-                detailsImage.src = product.imageUrl || `https://placehold.co/300x300/e0e0e0/000?text=${product.name}`;
-                detailsImage.onerror = function() { this.onerror=null; this.src='https://placehold.co/300x300/e0e0e0/000?text=صورة+غير+متوفرة'; }; 
-                detailsName.textContent = product.name;
-                detailsType.textContent = `النوع: ${product.type || 'غير محدد'}`;
-                detailsDescription.textContent = product.description;
-                detailsPrice.textContent = `${parseFloat(product.price).toFixed(0)} IQD`;
-                detailsAvailability.textContent = `التوفر: ${product.availability}`;
-                detailsAvailability.className = `availability ${
-                    product.availability === 'متوفر' ? 'bg-green-100 text-green-800' :
-                    product.availability === 'غير متوفر' ? 'bg-red-100 text-red-800' :
-                    'bg-blue-100 text-blue-800'
-                }`;
-                addToCartBtn.onclick = () => addProductToCart(product); 
-                navigateTo(productDetailsPage, product.name); 
+                lastProductDiscussed = product.id; // Set context for Layla
+
+                // Determine which image to use for the main product display
+                let mainProductImageSrc = product.imageUrl;
+                if (!isBook(product) && product.detailImageUrl) { // Use detailImageUrl for non-books if available
+                    mainProductImageSrc = product.detailImageUrl;
+                } else if (!product.imageUrl) { // Fallback if no image URL is provided at all
+                    mainProductImageSrc = `https://placehold.co/320x320/E0E7FF/3B82F6?text=Product+Image`;
+                }
+
+                productImage.src = mainProductImageSrc;
+                productImage.onerror = function() { handleImageError(this); };
+                productType.textContent = product.type || 'غير محدد';
+                productTitle.textContent = product.name;
+                productDescription.textContent = product.description;
+                productPrice.textContent = `${parseInt(product.price.replace(/,/g, '')).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+                productAvailability.innerHTML = `<span class="${
+                    product.availability === 'متوفر' ? 'text-green-600' :
+                    product.availability === 'غير متوفر' ? 'text-red-600' :
+                    'text-blue-600'
+                }">${product.availability}</span>`;
+
+                // Render average rating on details page
+                if (product.totalReviews > 0) {
+                    productDetailsRatingSummary.innerHTML = `
+                        ${renderStars(product.averageRating)}
+                        <span>${product.averageRating.toFixed(1)} / 5</span>
+                        <span class="total-reviews-count">(${product.totalReviews} تقييم)</span>
+                    `;
+                } else {
+                    productDetailsRatingSummary.innerHTML = `
+                        ${renderStars(0)}
+                        <span class="total-reviews-count">لا توجد تقييمات بعد</span>
+                    `;
+                }
+
+
+                // Clear previous color options and reset selected color
+                colorOptionsContainer.innerHTML = '';
+                selectedProductColor = null; // Ensure no color is pre-selected
+
+                // Display color options as buttons only if it's not a book and colors are available
+                if (!isBook(product) && product.colors && product.colors.length > 0) {
+                    noColorsMessageDetails.classList.add('hidden'); // Hide the "no colors" message
+                    // The h3 for "الألوان المتوفرة:" is now static in HTML, so no need to create it here.
+                    // Instead, we ensure the static h3 is visible.
+                    const staticColorTitle = colorOptionsContainer.previousElementSibling; // Assuming h3 is sibling
+                    if (staticColorTitle && staticColorTitle.tagName === 'H3') {
+                        staticColorTitle.classList.remove('hidden'); // Ensure it's visible
+                    }
+
+                    product.colors.forEach((color) => {
+                        const colorButton = document.createElement('button');
+                        colorButton.classList.add('color-button');
+                        colorButton.textContent = color.name; // Display color name as button text
+                        colorButton.dataset.color = color.name;
+                        colorButton.dataset.image = color.imageUrl || mainProductImageSrc; // Fallback to main image if color image not provided
+                        
+                        if (!color.available) {
+                            colorButton.classList.add('unavailable-color'); // Add a class for unavailable colors
+                            colorButton.disabled = true; // Disable unavailable color buttons
+                        }
+                        colorOptionsContainer.appendChild(colorButton);
+
+                        // Attach click listener for color buttons
+                        colorButton.onclick = (e) => {
+                            if (e.target.disabled) return; // Do nothing if button is disabled
+                            // Remove 'selected' from all color buttons
+                            document.querySelectorAll('.color-button').forEach(btn => btn.classList.remove('selected'));
+                            // Add 'selected' to the clicked button
+                            e.target.classList.add('selected');
+                            selectedProductColor = e.target.dataset.color;
+                            productImage.src = e.target.dataset.image; // Update image based on selected color
+                        };
+                    });
+                } else {
+                    colorOptionsContainer.innerHTML = ''; // Clear if no colors or it's a book
+                    noColorsMessageDetails.classList.remove('hidden'); // Show the "no colors" message
+                    // Append the message if it's not already there
+                    if (!colorOptionsContainer.contains(noColorsMessageDetails)) {
+                        colorOptionsContainer.appendChild(noColorsMessageDetails);
+                    }
+                    // Hide the static h3 if no colors are available
+                    const staticColorTitle = colorOptionsContainer.previousElementSibling;
+                    if (staticColorTitle && staticColorTitle.tagName === 'H3') {
+                        staticColorTitle.classList.add('hidden');
+                    }
+                }
+
+                const isProductAvailable = product.availability === 'متوفر';
+                addToCartButton.onclick = isProductAvailable ? () => addProductToCart(product) : null;
+                if (!isProductAvailable) {
+                    addToCartButton.classList.add('disabled');
+                    addToCartButton.setAttribute('disabled', 'true');
+                } else {
+                    addToCartButton.classList.remove('disabled');
+                    addToCartButton.removeAttribute('disabled');
+                }
+
+                // Display suggested products
+                displaySuggestedProducts(productId);
+                
+                // Load and display reviews for this product
+                await loadAndDisplayProductReviews(productId);
+
+                navigateTo(productDetailsPage, 'تفاصيل المنتج'); 
             }
         }
 
-        // --- Cart Logic ---
         /**
          * Adds a product to the cart.
          * @param {Object} product - The product object to add.
          */
         function addProductToCart(product) {
-            const existingItem = cartItems.find(item => item.id === product.id);
+            let itemToAdd = { ...product };
+
+            // If it's not a book and has colors, and a color is selected
+            if (!isBook(product) && product.colors && product.colors.length > 0) {
+                if (!selectedProductColor) {
+                    alertMessage('الرجاء اختيار لون للمنتج.', 'info');
+                    return;
+                }
+                itemToAdd.selectedColor = selectedProductColor;
+            }
+
+            // Check if item (with or without selected color) already exists in cart
+            const existingItem = cartItems.find(item => 
+                item.id === itemToAdd.id && 
+                item.selectedColor === itemToAdd.selectedColor
+            );
+
             if (existingItem) {
                 existingItem.quantity++;
             } else {
-                cartItems.push({ ...product, quantity: 1 });
+                itemToAdd.quantity = 1;
+                cartItems.push(itemToAdd);
             }
             updateCartDisplay();
             alertMessage('تمت إضافة المنتج إلى السلة!', 'success');
@@ -1443,6 +2502,9 @@
          * @param {string} productId - The ID of the product to remove.
          */
         function removeProductFromCart(productId) {
+            // Note: This function currently removes by productId only.
+            // For carts with color variants, you might need to pass both productId and selectedColor
+            // to accurately remove a specific item. For simplicity, keeping it by ID for now.
             cartItems = cartItems.filter(item => item.id !== productId);
             updateCartDisplay();
             alertMessage('تم حذف المنتج من السلة.', 'info');
@@ -1454,7 +2516,10 @@
          * @param {number} delta - Change in quantity (+1 or -1).
          */
         function updateCartItemQuantity(productId, delta) {
-            const item = cartItems.find(i => i.id === productId);
+            // Note: This function currently updates by productId only.
+            // For carts with color variants, you might need to pass both productId and selectedColor
+            // to accurately update a specific item. For simplicity, keeping it by ID for now.
+            const item = cartItems.find(i => i.id === productId); 
             if (item) {
                 item.quantity += delta;
                 if (item.quantity <= 0) {
@@ -1475,7 +2540,7 @@
             let hasOtherProducts = false;
 
             cartItems.forEach(item => {
-                if (item.type && (item.type.toLowerCase().includes('كتاب') || item.type.toLowerCase().includes('رواية') || item.type.toLowerCase().includes('أدبي'))) {
+                if (isBook(item)) { // Use isBook helper
                     hasBooks = true;
                 } else {
                     hasOtherProducts = true;
@@ -1503,26 +2568,26 @@
             const selectedGovernorate = governorateSelect.value; 
 
             if (cartItems.length === 0) {
-                cartItemsContainer.innerHTML = '<p class="text-center text-gray-500">سلتك فارغة حالياً.</p>';
+                cartItemsContainer.innerHTML = '<p class="text-center text-gray-500 p-4">سلتك فارغة حالياً.</p>';
             } else {
                 cartItems.forEach(item => {
-                    const itemPrice = parseFloat(item.price.replace(/[^0-9.-]+/g,"")); 
+                    const itemPrice = typeof item.price === 'string' ? parseInt(item.price.replace(/,/g, '')) : item.price; 
                     productsSubtotal += itemPrice * item.quantity;
 
                     const cartItemDiv = document.createElement('div');
                     cartItemDiv.classList.add('cart-item');
                     cartItemDiv.innerHTML = `
-                        <img src="${item.imageUrl || `https://placehold.co/60x60/e0e0e0/000?text=${item.name}`}" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/60x60/e0e0e0/000?text=صورة';">
-                        <div class="cart-item-info">
-                            <h4>${item.name}</h4>
-                            <p>${item.price} IQD x ${item.quantity}</p>
+                        <span class="cart-item-title">${item.name} ${item.selectedColor ? `(${item.selectedColor})` : ''}</span>
+                        <img src="${item.imageUrl || `https://placehold.co/60x60/e0e0e0/000?text=${item.name}`}" alt="${item.name}" onerror="handleImageError(this);">
+                        <div class="cart-item-controls-wrapper">
+                            <div class="quantity-controls">
+                                <button data-id="${item.id}" data-delta="-1" aria-label="تقليل الكمية">-</button>
+                                <span>${item.quantity}</span>
+                                <button data-id="${item.id}" data-delta="1" aria-label="زيادة الكمية">+</button>
+                            </div>
+                            <button data-id="${item.id}" class="remove-btn" aria-label="حذف المنتج"><i class="fas fa-trash"></i></button>
                         </div>
-                        <div class="quantity-controls">
-                            <button data-id="${item.id}" data-delta="-1">-</button>
-                            <span>${item.quantity}</span>
-                            <button data-id="${item.id}" data-delta="1">+</button>
-                        </div>
-                        <button data-id="${item.id}" class="remove-btn"><i class="fas fa-trash"></i></button>
+                        <p class="cart-item-price-quantity">${itemPrice.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} د.ع x ${item.quantity}</p>
                     `;
                     cartItemsContainer.appendChild(cartItemDiv);
                 });
@@ -1531,10 +2596,11 @@
             deliveryCost = calculateDeliveryCost(selectedGovernorate);
             const finalTotal = productsSubtotal + deliveryCost;
 
-            productsSubtotalDisplay.textContent = `${productsSubtotal.toFixed(0)} IQD`; 
-            deliveryCostDisplay.textContent = `${deliveryCost.toFixed(0)} IQD`;
-            finalTotalDisplay.textContent = `${finalTotal.toFixed(0)} IQD`;
-            totalPriceFormInput.value = finalTotal.toFixed(0); 
+            // Use 'en-US' locale for all total price displays
+            productsSubtotalDisplay.textContent = `${productsSubtotal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} د.ع`; 
+            deliveryCostDisplay.textContent = `${deliveryCost.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} د.ع`;
+            finalTotalDisplay.textContent = `${finalTotal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} د.ع`;
+            totalPriceFormInput.value = finalTotal.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); 
 
             document.querySelectorAll('.remove-btn').forEach(button => {
                 button.onclick = (e) => removeProductFromCart(e.target.dataset.id || e.target.closest('button').dataset.id);
@@ -1548,82 +2614,207 @@
             });
         }
 
-        // --- Layla Chat Logic ---
         /**
-         * Layla's AI logic to respond to user queries in the chat.
+         * Layla's AI logic to respond to user queries.
          * This function is now enhanced to log interactions to Firestore.
          * @param {string} queryText - The user's query.
+         * @returns {Promise<string>} Layla's response.
          */
         async function getLaylaResponse(queryText) {
-            const lowerCaseQuery = queryText.toLowerCase();
+            console.log("getLaylaResponse called with query:", queryText); 
+            const sanitizedQuery = escapeHtml(queryText.trim()); // Sanitize input
+            const lowerCaseQuery = sanitizedQuery.toLowerCase();
             let response = 'عذراً، لم أفهم سؤالك. هل يمكنك إعادة الصياغة؟';
-            let intentIdentified = 'عدم_فهم';
+            let intentIdentified = 'unanswered'; // Default to unanswered
             let isUnanswered = true;
+            let bestMatchScore = 0; 
+            let matchedIntent = null;
+            let matchedProduct = null;
+            let extractedPrice = null; // For price alerts
 
-            try {
-                // 1. Try to match an Intent
-                for (const intent of allIntents) {
-                    const trainingPhrases = intent.trainingPhrases.map(p => p.toLowerCase());
-                    if (trainingPhrases.some(phrase => lowerCaseQuery.includes(phrase))) {
-                        response = intent.output;
-                        intentIdentified = intent.name;
-                        isUnanswered = false;
-                        break;
-                    }
-                }
+            // Try to extract a number for price alerts
+            const priceMatch = lowerCaseQuery.match(/(\d+)\s*(دينار|د.ع|iqd|دولار|usd)/);
+            if (priceMatch && priceMatch[1]) {
+                extractedPrice = parseInt(priceMatch[1]);
+            }
 
-                // 2. If no intent matched, try to match a Product
-                if (isUnanswered) { // Only try product matching if no intent was found
-                    for (const product of allProducts) {
-                        const productNameLower = product.name.toLowerCase();
-                        const productDescriptionLower = product.description.toLowerCase();
-                        const productTypeLower = product.type ? product.type.toLowerCase() : '';
+            // --- Intent Matching (Prioritized) ---
 
-                        if (lowerCaseQuery.includes(productNameLower) ||
-                            lowerCaseQuery.includes(productDescriptionLower) ||
-                            lowerCaseQuery.includes(productTypeLower)) {
-                            response = `بالتأكيد! لدينا "${product.name}" (النوع: ${product.type || 'غير محدد'}). وصف المنتج: "${product.description}". السعر: ${parseFloat(product.price).toFixed(0)} IQD. حالة التوفر: ${product.availability}.`;
-                            intentIdentified = 'معلومات_منتج'; // A generic intent for product info
+            // 1. Prioritize General Intents (e.g., greetings, thanks)
+            for (const intent of allIntents) {
+                if (intent.intentType === 'general_greeting' || intent.intentType === 'general_thanks' || intent.intentType === 'general_farewell') {
+                    for (const phrase of (intent.trainingPhrases || [])) {
+                        const lowerCasePhrase = phrase.toLowerCase();
+                        let currentScore = 0;
+                        if (lowerCaseQuery === lowerCasePhrase) { // Exact match
+                            currentScore = 100;
+                        } else if (lowerCaseQuery.includes(lowerCasePhrase)) { // Partial match
+                            currentScore = lowerCasePhrase.length * 5; // Higher weight for general phrases
+                        }
+                        if (currentScore > bestMatchScore) {
+                            bestMatchScore = currentScore;
+                            matchedIntent = intent;
                             isUnanswered = false;
-                            break;
                         }
                     }
                 }
-
-                // Log the interaction to Firestore
-                // Corrected Firestore path to match dashboard's expectation
-                await addDoc(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${ADMIN_USER_ID}/chat_logs`), {
-                    userId: clientUserId, // Use the client's actual UID
-                    timestamp: Timestamp.now(),
-                    userQuery: queryText,
-                    laylaResponse: response,
-                    intentIdentified: intentIdentified,
-                    unanswered: isUnanswered, // Changed to 'unanswered' to match dashboard
-                    reviewed: false // New field to track if reviewed by admin
-                });
-                console.log("Layla interaction logged to Firestore from store.");
-
-                return response;
-
-            } catch (e) {
-                console.error("Error in Layla AI logic or Firestore logging from store:", e);
-                // Attempt to log the error interaction itself
-                try {
-                    // Corrected Firestore path for error logging as well
-                    await addDoc(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${ADMIN_USER_ID}/chat_logs`), {
-                        userId: clientUserId,
-                        timestamp: Timestamp.now(),
-                        userQuery: queryText,
-                        laylaResponse: `حدث خطأ: ${e.message}`,
-                        intentIdentified: 'خطأ_نظام',
-                        unanswered: true, // Mark as unanswered due to error
-                        reviewed: false
-                    });
-                } catch (logError) {
-                    console.error("Failed to log error interaction from store:", logError);
-                }
-                return `حدث خطأ أثناء محاولة ليلى الرد: ${e.message}`;
             }
+
+            // If a strong general intent is found, use it
+            if (matchedIntent && bestMatchScore >= 50) { // Threshold for general intents
+                response = matchedIntent.output[Math.floor(Math.random() * matchedIntent.output.length)]; // Random response
+                intentIdentified = matchedIntent.intentType;
+                lastIntentType = intentIdentified; // Update context
+                // Log and return
+                await logLaylaInteraction(sanitizedQuery, response, intentIdentified, isUnanswered);
+                return response;
+            }
+
+            // 2. Product-related Intents and Entity Extraction
+            let identifiedProduct = null;
+            let identifiedColor = null;
+
+            // Try to find a product name or synonym in the query
+            for (const product of allProducts) {
+                const productNames = [product.name.toLowerCase(), ...(product.synonyms || []).map(s => s.toLowerCase())];
+                for (const pName of productNames) {
+                    if (lowerCaseQuery.includes(pName) && pName.length > 2) { // Ensure reasonable length match
+                        identifiedProduct = product;
+                        lastProductDiscussed = product.id; // Update context
+                        break;
+                    }
+                }
+                if (identifiedProduct) break;
+            }
+
+            // Use context if product not explicitly mentioned but was discussed recently
+            if (!identifiedProduct && lastProductDiscussed) {
+                identifiedProduct = allProducts.find(p => p.id === lastProductDiscussed);
+            }
+
+            // Try to find a color if product has colors
+            if (identifiedProduct && !isBook(identifiedProduct) && identifiedProduct.colors && identifiedProduct.colors.length > 0) {
+                for (const colorOption of identifiedProduct.colors) {
+                    if (lowerCaseQuery.includes(colorOption.name.toLowerCase())) {
+                        identifiedColor = colorOption.name;
+                        break;
+                    }
+                }
+            }
+
+
+            // 3. Match Specific Product/Service Intents
+            bestMatchScore = 0; // Reset score for specific intents
+            matchedIntent = null;
+
+            for (const intent of allIntents) {
+                if (intent.intentType === 'product_inquiry_general' ||
+                    intent.intentType === 'product_availability' ||
+                    intent.intentType === 'product_details' ||
+                    intent.intentType === 'shipping_info' ||
+                    intent.intentType === 'payment_methods' ||
+                    intent.intentType === 'store_hours' ||
+                    intent.intentType === 'request_price_alert' || // New alert intents
+                    intent.intentType === 'request_availability_alert') {
+
+                    for (const phrase of (intent.trainingPhrases || [])) {
+                        const lowerCasePhrase = phrase.toLowerCase();
+                        let currentScore = 0;
+
+                        // Simple keyword matching for now, can be expanded with pattern matching
+                        const intentKeywords = (intent.keywords || []).map(k => k.toLowerCase());
+                        let matchedKeywordsCount = intentKeywords.filter(k => lowerCaseQuery.includes(k)).length;
+                        currentScore += matchedKeywordsCount * 10; // Weight for keywords
+
+                        if (lowerCaseQuery.includes(lowerCasePhrase)) {
+                            currentScore += lowerCasePhrase.length;
+                        }
+
+                        if (currentScore > bestMatchScore) {
+                            bestMatchScore = currentScore;
+                            matchedIntent = intent;
+                            isUnanswered = false;
+                        }
+                    }
+                }
+            }
+
+            // --- Generate Response based on Best Match ---
+            if (!isUnanswered && matchedIntent) {
+                intentIdentified = matchedIntent.intentType;
+                lastIntentType = intentIdentified; // Update context
+
+                // Handle specific intent types
+                if (intentIdentified === 'product_inquiry_general' || intentIdentified === 'product_details' || intentIdentified === 'product_availability') {
+                    if (identifiedProduct) {
+                        response = `بالتأكيد! لدينا "${identifiedProduct.name}" (النوع: ${identifiedProduct.type || 'غير محدد'}). وصف المنتج: "${identifiedProduct.description}". السعر: ${parseInt(identifiedProduct.price.replace(/,/g, '')).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} د.ع. حالة التوفر: ${identifiedProduct.availability}.`;
+                        if (!isBook(identifiedProduct) && identifiedProduct.colors && identifiedProduct.colors.length > 0) {
+                            const availableColors = identifiedProduct.colors.filter(c => c.available).map(c => c.name);
+                            if (availableColors.length > 0) {
+                                response += ` الألوان المتوفرة: ${availableColors.join(', ')}.`;
+                            } else {
+                                response += ` لا توجد ألوان متوفرة حالياً لهذا المنتج.`;
+                            }
+                        }
+                        // Check for FAQ for this product
+                        if (identifiedProduct.faq && identifiedProduct.faq.length > 0) {
+                            for (const faqItem of identifiedProduct.faq) {
+                                if (lowerCaseQuery.includes(faqItem.question.toLowerCase())) {
+                                    response = faqItem.answer; // Use specific FAQ answer
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        response = matchedIntent.output[Math.floor(Math.random() * matchedIntent.output.length)] || "عذراً، لم أتمكن من تحديد المنتج الذي تتحدث عنه.";
+                    }
+                } else if (intentIdentified === 'request_price_alert' || intentIdentified === 'request_availability_alert') {
+                    if (identifiedProduct && clientUserId && auth.currentUser) {
+                        const requestType = (intentIdentified === 'request_price_alert') ? 'price_drop' : 'availability';
+                        let finalTargetPrice = extractedPrice;
+
+                        if (requestType === 'price_drop' && !finalTargetPrice) {
+                            response = `الرجاء تحديد السعر الذي تريد أن يتم تنبيهك عنده لـ "${identifiedProduct.name}".`;
+                        } else {
+                            // Save notification request to Firestore
+                            await addDoc(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${clientUserId}/notification_requests`), { // Store under client's ID
+                                userId: clientUserId,
+                                productId: identifiedProduct.id,
+                                requestType: requestType,
+                                targetPrice: finalTargetPrice || null, // Only for price_drop
+                                status: "active",
+                                timestamp: Timestamp.now(),
+                                productName: identifiedProduct.name
+                            });
+                            response = `تم تسجيل طلبك! سأرسل لك إشعارًا عندما ${requestType === 'price_drop' ? `ينخفض سعر "${identifiedProduct.name}" إلى ${finalTargetPrice} د.ع.` : `يتوفر "${identifiedProduct.name}"`}.`;
+                        }
+                    } else {
+                        response = "عذراً، لا أستطيع تسجيل طلب الإشعار حالياً. يرجى التأكد من تحديد المنتج أو تسجيل الدخول.";
+                    }
+                } else {
+                    // For other intents, use a random response from outputs
+                    response = matchedIntent.output[Math.floor(Math.random() * matchedIntent.output.length)];
+                }
+            }
+
+            // If still unanswered, use a generic fallback
+            if (isUnanswered) {
+                // If there's an 'unanswered' intent type, use its output
+                const unansweredIntent = allIntents.find(i => i.intentType === 'unanswered');
+                if (unansweredIntent && unansweredIntent.output && unansweredIntent.output.length > 0) {
+                    response = unansweredIntent.output[Math.floor(Math.random() * unansweredIntent.output.length)];
+                } else {
+                    response = 'عذراً، لم أفهم سؤالك. هل يمكنك إعادة الصياغة؟ يمكنني مساعدتك بخصوص المنتجات، الشحن، أو طرق الدفع.';
+                }
+                lastIntentType = 'unanswered'; // Update context
+            }
+
+            console.log("Layla's response generated:", response); 
+
+            // Log the interaction to Firestore
+            await logLaylaInteraction(sanitizedQuery, response, intentIdentified, isUnanswered);
+
+            return response;
         }
 
         /**
@@ -1631,13 +2822,18 @@
          * @param {string} sender - The sender of the message (e.g., "أنت", "ليلى").
          * @param {string} text - The message text.
          * @param {string} type - CSS class for styling ('user-message' or 'layla-message').
+         * @returns {HTMLElement} The created message element.
          */
         function addChatMessage(sender, text, type) {
+            console.log(`Adding message: ${sender}: ${text} with type ${type}`); 
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', type);
-            messageDiv.textContent = `${sender}: ${text}`;
+            // Use textContent for safety against XSS, as input is already sanitized
+            messageDiv.textContent = `${sender}: ${text}`; 
             chatMessagesContainer.appendChild(messageDiv);
             chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+            console.log("Chat messages container scrolled."); 
+            return messageDiv; 
         }
 
         // --- Notification Logic ---
@@ -1750,34 +2946,234 @@
             localStorage.setItem('savedAddress', JSON.stringify(address));
         }
 
+        /**
+         * Adds a completed order to Firestore. This document will trigger a Firebase Function
+         * to update salesCount for products.
+         */
+        async function addCompletedOrderToFirestore() {
+            if (!db || !clientUserId || cartItems.length === 0) {
+                console.warn("Cannot add completed order: DB not ready, user not authenticated, or cart is empty.");
+                return;
+            }
+
+            const orderItems = cartItems.map(item => ({
+                productId: item.id,
+                quantity: item.quantity,
+                price: typeof item.price === 'string' ? parseInt(item.price.replace(/,/g, '')) : item.price,
+                name: item.name,
+                selectedColor: item.selectedColor || null
+            }));
+
+            try {
+                // Store completed order under ADMIN_USER_ID path, as a central point for sales tracking
+                await addDoc(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/users/${ADMIN_USER_ID}/completed_orders`), {
+                    userId: clientUserId, // The actual client's UID who made the purchase
+                    timestamp: Timestamp.now(),
+                    items: orderItems,
+                    totalAmount: parseFloat(finalTotalDisplay.textContent.replace(' د.ع', '').replace(/,/g, '')),
+                    governorate: governorateSelect.value,
+                    area: areaInput.value,
+                    phoneNumber: phoneNumberInput.value,
+                    status: 'completed'
+                });
+                console.log("Completed order logged to Firestore.");
+            } catch (error) {
+                console.error("Error logging completed order to Firestore:", error);
+                alertMessage('حدث خطأ في تسجيل الطلب المكتمل.', 'error');
+            }
+        }
+
+
         // Custom Confirm Modal (replaces window.confirm)
         function showCustomConfirmModal(title, message, onConfirm, onCancel) {
-            const modal = document.createElement('div');
-            modal.classList.add('app-modal', 'open');
-            modal.innerHTML = `
-                <div class="app-modal-content">
-                    <h3 class="text-xl font-bold text-center mb-4">${title}</h3>
-                    <p class="text-gray-700 text-center mb-6">${message}</p>
-                    <div class="flex justify-around gap-4">
-                        <button id="confirmBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex-1">موافق</button>
-                        <button id="cancelBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex-1">إلغاء</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
+            customConfirmModal.classList.add('open');
+            customConfirmModal.classList.remove('hidden');
+            customConfirmTitle.textContent = title;
+            customConfirmMessage.textContent = message;
+            customConfirmOnConfirm = onConfirm;
+            customConfirmOnCancel = onCancel;
 
-            modal.querySelector('#confirmBtn').onclick = () => {
-                onConfirm();
-                modal.remove();
+            customConfirmModal.querySelector('#confirmBtn').onclick = () => {
+                customConfirmOnConfirm();
+                hideModal(customConfirmModal);
             };
-            modal.querySelector('#cancelBtn').onclick = () => {
-                onCancel();
-                modal.remove();
+            customConfirmModal.querySelector('#cancelBtn').onclick = () => {
+                customConfirmOnCancel();
+                hideModal(customConfirmModal);
             };
         }
 
 
+        // --- Page Initialization Functions ---
+        function initChatPage() {
+            // Clear existing messages and add initial Layla message
+            chatMessagesContainer.innerHTML = `
+                <div class="layla-message message">
+                    مرحباً! كيف يمكنني مساعدتك اليوم؟
+                </div>`;
+            chatInput.value = ''; // Ensure chat input is clear
+            lastProductDiscussed = null; // Reset context
+            lastIntentType = null; // Reset context
+        }
+
+        function initProductsPage() {
+            productSearchInput.value = ''; // Clear search input
+            productTypeFilterStore.value = ''; // Reset type filter
+            currentFilter = 'all'; // Reset current filter state
+            applyProductFilter(); // Re-apply filter to show all products
+        }
+
+        // --- Reviews and Rating Logic ---
+        let currentProductForReviews = null; // To store the product ID for which reviews are being shown
+
+        // Event listener for rating stars in the review form
+        reviewRatingStars.querySelectorAll('.star-input').forEach(star => {
+            star.addEventListener('click', (e) => {
+                const rating = parseInt(e.target.dataset.rating);
+                selectedRatingInput.value = rating;
+                // Update star visuals
+                reviewRatingStars.querySelectorAll('.star-input').forEach(s => {
+                    if (parseInt(s.dataset.rating) <= rating) {
+                        s.classList.remove('far');
+                        s.classList.add('fas', 'selected');
+                    } else {
+                        s.classList.remove('fas', 'selected');
+                        s.classList.add('far');
+                    }
+                });
+            });
+            // Hover effect
+            star.addEventListener('mouseover', (e) => {
+                const hoverRating = parseInt(e.target.dataset.rating);
+                reviewRatingStars.querySelectorAll('.star-input').forEach(s => {
+                    if (parseInt(s.dataset.rating) <= hoverRating) {
+                        s.classList.add('hovered'); // Add a class for hover effect
+                    } else {
+                        s.classList.remove('hovered');
+                    }
+                });
+            });
+            star.addEventListener('mouseout', () => {
+                reviewRatingStars.querySelectorAll('.star-input').forEach(s => s.classList.remove('hovered'));
+            });
+        });
+
+        // Review form submission
+        reviewForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!currentProductForReviews) {
+                alertMessage('حدث خطأ: لا يوجد منتج محدد لإضافة تقييم له.', 'error');
+                return;
+            }
+            if (!clientUserId || !auth.currentUser) {
+                alertMessage('الرجاء تسجيل الدخول لإضافة تقييم.', 'info');
+                return;
+            }
+
+            const reviewerName = escapeHtml(reviewerNameInput.value.trim());
+            const rating = parseInt(selectedRatingInput.value);
+            const comment = escapeHtml(reviewCommentInput.value.trim());
+
+            if (!reviewerName || rating === 0 || !comment) {
+                alertMessage('الرجاء ملء جميع حقول التقييم واختيار عدد النجوم.', 'error');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/product_reviews`), { // New collection for reviews
+                    productId: currentProductForReviews,
+                    userId: clientUserId,
+                    userName: reviewerName,
+                    rating: rating,
+                    comment: comment,
+                    timestamp: Timestamp.now(),
+                    productName: allProducts.find(p => p.id === currentProductForReviews)?.name || 'غير معروف' // Store product name for dashboard ease
+                });
+
+                alertMessage('تم إرسال تقييمك بنجاح!', 'success');
+                reviewForm.reset(); // Clear form
+                selectedRatingInput.value = '0'; // Reset hidden rating
+                reviewRatingStars.querySelectorAll('.star-input').forEach(s => { // Reset star visuals
+                    s.classList.remove('fas', 'selected', 'hovered');
+                    s.classList.add('far');
+                });
+                // Re-load reviews to show the new one (onSnapshot will handle this if active)
+                await loadAndDisplayProductReviews(currentProductForReviews);
+
+                // IMPORTANT: The actual update of product.averageRating and product.totalReviews
+                // will need a Firebase Function triggered by this new review document.
+                // The frontend cannot reliably calculate and update these for all products.
+
+            } catch (error) {
+                console.error("Error adding review:", error);
+                alertMessage('حدث خطأ أثناء إرسال تقييمك. يرجى المحاولة مرة أخرى.', 'error');
+            }
+        });
+
+        /**
+         * Loads and displays reviews for a specific product.
+         * @param {string} productId - The ID of the product.
+         */
+        async function loadAndDisplayProductReviews(productId) {
+            currentProductForReviews = productId; // Set global context for review form
+            productReviewsDisplay.innerHTML = ''; // Clear previous reviews
+            reviewsCountSpan.textContent = '0'; // Reset count
+
+            try {
+                const reviewsQuery = query(
+                    collection(db, `artifacts/${APP_ID_FOR_FIRESTORE_PATH}/product_reviews`),
+                    where("productId", "==", productId)
+                );
+                const querySnapshot = await getDocs(reviewsQuery);
+
+                const reviews = [];
+                querySnapshot.forEach(doc => {
+                    reviews.push({ id: doc.id, ...doc.data() });
+                });
+
+                reviews.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0)); // Newest first
+
+                reviewsCountSpan.textContent = reviews.length;
+
+                if (reviews.length === 0) {
+                    productReviewsDisplay.innerHTML = '<p class="no-reviews-message">لا توجد تقييمات لهذا المنتج بعد.</p>';
+                } else {
+                    reviews.forEach(review => {
+                        const reviewItemDiv = document.createElement('div');
+                        reviewItemDiv.classList.add('review-item');
+                        const reviewDate = review.timestamp?.toDate ? new Date(review.timestamp.toDate()) : new Date(review.timestamp);
+                        
+                        reviewItemDiv.innerHTML = `
+                            <div class="review-header">
+                                <span class="reviewer-name">${escapeHtml(review.userName || 'مستخدم مجهول')}</span>
+                                <span class="review-date">${reviewDate.toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                            </div>
+                            <div class="review-stars">
+                                ${renderStars(review.rating)}
+                            </div>
+                            <p class="review-comment">${escapeHtml(review.comment)}</p>
+                        `;
+                        productReviewsDisplay.appendChild(reviewItemDiv);
+                    });
+                }
+            } catch (error) {
+                console.error("Error loading product reviews:", error);
+                productReviewsDisplay.innerHTML = '<p class="no-reviews-message text-red-500">حدث خطأ أثناء تحميل التقييمات.</p>';
+            }
+        }
+
         // --- Event Listeners ---
+        // Debounced search and filter
+        const debouncedApplyProductFilter = debounce(applyProductFilter, 300);
+        productSearchInput.oninput = debouncedApplyProductFilter;
+
+        // Corrected productTypeFilterStore.onchange to update currentFilter
+        productTypeFilterStore.onchange = () => {
+            currentFilter = productTypeFilterStore.value || 'all';
+            debouncedApplyProductFilter();
+        };
+
         // Bottom Navigation
         navItems.forEach(item => {
             item.onclick = () => {
@@ -1785,16 +3181,17 @@
                 let pageElement;
                 let pageTitle;
 
+                // Dynamically get page element by ID
                 if (pageId === 'products-page') {
-                    pageElement = productsPage;
+                    pageElement = document.getElementById('products-page');
                     pageTitle = 'متجر TERAKS'; 
-                    currentFilter = 'all'; 
-                    applyProductFilter();
+                    initProductsPage(); // Initialize products page
                 } else if (pageId === 'chat-page') {
-                    pageElement = chatPage;
+                    pageElement = document.getElementById('chat-page');
                     pageTitle = 'تحدث مع ليلى';
+                    initChatPage(); // Initialize chat page
                 } else if (pageId === 'cart-page') {
-                    pageElement = cartPage;
+                    pageElement = document.getElementById('cart-page');
                     pageTitle = 'السلة';
                     updateCartDisplay(); 
                 }
@@ -1802,36 +3199,65 @@
             };
         });
 
-        // Product Search
-        productSearchInput.oninput = applyProductFilter;
-
-        // Product Type Filter
-        productTypeFilterStore.onchange = (e) => {
-            currentFilter = e.target.value === '' ? 'all' : e.target.value;
-            applyProductFilter();
-        };
-
         // Show Offers Button
         showOffersBtn.onclick = () => {
             currentFilter = 'offers';
             productTypeFilterStore.value = ''; 
             productSearchInput.value = ''; 
-            applyProductFilter();
+            applyProductFilter(); // Apply filter for offers
+        };
+
+        // New: Show Best Selling Button
+        showBestSellingBtn.onclick = () => {
+            currentFilter = 'best-selling';
+            productTypeFilterStore.value = ''; 
+            productSearchInput.value = ''; 
+            applyProductFilter(); // Apply filter for best-selling
+        };
+
+        // New: Show Most Rated Button
+        showMostRatedBtn.onclick = () => {
+            currentFilter = 'most-rated';
+            productTypeFilterStore.value = ''; 
+            productSearchInput.value = ''; 
+            applyProductFilter(); // Apply filter for most-rated
         };
 
         // Back button on Product Details Page
         backToProductsBtn.onclick = () => {
             navigateTo(productsPage, 'متجر TERAKS', true); 
+            lastProductDiscussed = null; // Clear product context when leaving details page
+            currentProductForReviews = null; // Clear review context
         };
 
         // Chat Send Button
         sendChatBtn.onclick = async () => {
             const query = chatInput.value.trim();
-            if (query) {
-                addChatMessage("أنت", query, 'user-message');
-                chatInput.value = ''; 
-                const laylaResponse = await getLaylaResponse(query); // Call Layla's AI logic
+            if (!query) {
+                // If query is empty, just re-enable buttons and return
+                chatInput.disabled = false;
+                sendChatBtn.disabled = false;
+                sendChatBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                return;
+            }
+
+            addChatMessage("أنت", query, 'user-message');
+            chatInput.value = ''; 
+            
+            chatInput.disabled = true;
+            sendChatBtn.disabled = true;
+            sendChatBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'; 
+            
+            try {
+                const laylaResponse = await getLaylaResponse(query); 
                 addChatMessage("ليلى", laylaResponse, 'layla-message');
+            } catch (error) {
+                console.error("Error sending message or getting Layla's response:", error);
+                addChatMessage("ليلى", "عذراً، حدث خطأ أثناء محاولة الرد. يرجى المحاولة مرة أخرى.", 'layla-message');
+            } finally {
+                chatInput.disabled = false;
+                sendChatBtn.disabled = false;
+                sendChatBtn.innerHTML = '<i class="fas fa-paper-plane"></i>'; 
             }
         };
 
@@ -1869,7 +3295,7 @@
 
             // Add cart items to order details
             orderDetails['المنتجات المطلوبة'] = cartItems.map(item => 
-                `${item.name} (${item.type || 'غير محدد'}) - ${parseFloat(item.price).toFixed(0)} IQD x ${item.quantity}`
+                `${item.name} (${item.type || 'غير محدد'}${item.selectedColor ? `, اللون: ${item.selectedColor}` : ''}) - ${typeof item.price === 'string' ? parseInt(item.price.replace(/,/g, '')) : item.price} د.ع x ${item.quantity}`
             ).join('\n');
             orderDetails['إجمالي المنتجات'] = productsSubtotalDisplay.textContent;
             orderDetails['تكلفة التوصيل'] = deliveryCostDisplay.textContent;
@@ -1893,6 +3319,8 @@
                 if (response.ok) {
                     alertMessage('!تم إرسال طلبك بنجاح', 'success');
                     hideModal(checkoutModal);
+                    // NEW: Log completed order to Firestore to trigger salesCount update
+                    await addCompletedOrderToFirestore(); 
                     cartItems = []; 
                     updateCartDisplay();
                     if (saveAddressCheckbox.checked) {
@@ -1905,8 +3333,8 @@
                     alertMessage(`خطأ في إرسال الطلب: ${data.errors ? data.errors.map(err => err.message).join(', ') : 'خطأ غير معروف'}`, 'error');
                 }
             } catch (error) {
-                alertMessage('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.', 'error');
-                console.error('Form submission error:', error);
+                    alertMessage('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.', 'error');
+                    console.error('Form submission error:', error);
             }
         };
 
@@ -1936,14 +3364,14 @@
         closePrivacyPolicyModalBtn.onclick = () => hideModal(privacyPolicyModal);
 
 
+        // Initial setup for default selected color on product details page
+        // This needs to run after the product details are loaded, so it's handled within showProductDetails now.
+
         // Initialize Firebase when the window loads
         window.onload = () => {
             initializeFirebase();
             // Set initial page to products
             navigateTo(productsPage, 'متجر TERAKS'); 
-            
-            // Remove sample products now that the app is fully functional
-            // allProducts will be populated directly from Firestore
         };
     </script>
 </body>
